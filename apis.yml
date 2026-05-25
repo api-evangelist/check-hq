@@ -1,0 +1,363 @@
+aid: check-hq
+name: Check
+description: >-
+  Check is an embedded payroll infrastructure platform that allows vertical
+  SaaS, HR, workforce management, and financial services companies to
+  natively offer payroll inside their own products. Check provides a
+  comprehensive REST API, a library of white-labeled React components
+  (Check Components and Check Onboard), a CLI, and a Model Context
+  Protocol (MCP) server that together cover company and employee
+  onboarding, pay schedules, payroll preview and approval, contractor
+  payments, tax calculation, multi-state withholdings, tax filings, tax
+  deposits, money movement, paystubs, garnishments, post-tax deductions,
+  net pay splits, benefits (health, 401k, workers' comp), W-2 and 1099
+  generation, and webhook event delivery. Check operates in all 50 U.S.
+  states plus D.C., has been incubated and led-funded by Stripe (Series B
+  and Series C), and powers payroll for partners such as Homebase,
+  ServiceTitan, 7shifts, Housecall Pro, Wave, Zoho, and Procare —
+  collectively paying more than 1M employees across 35,000+ businesses
+  and moving $15B+ annually.
+type: Index
+position: Provider
+access: 3rd-Party
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+tags:
+  - Payroll
+  - Embedded Payroll
+  - Payroll Infrastructure
+  - Payroll API
+  - Tax Filing
+  - Tax Calculation
+  - Money Movement
+  - HR
+  - Human Resources
+  - Workforce Management
+  - Fintech
+  - Compensation
+  - Benefits
+  - 1099
+  - W-2
+  - Contractor Payments
+  - Embedded Finance
+url: https://raw.githubusercontent.com/api-evangelist/check-hq/refs/heads/main/apis.yml
+created: '2026-05-25'
+modified: '2026-05-25'
+specificationVersion: '0.20'
+apis:
+  - aid: check-hq:payroll-api
+    name: Check Payroll API
+    description: >-
+      The Check Payroll API is a comprehensive REST API for embedding
+      end-to-end U.S. payroll inside another platform. It models companies,
+      workplaces, employees, contractors, pay schedules, paydays, payroll
+      cycles, payroll items, earnings (regular, overtime, tipped, piece
+      rate, reimbursements), post-tax deductions and garnishments,
+      benefits (pre-tax and post-tax), net pay splits, paystubs, paper
+      checks, money movement, tax parameters and elections, tax deposits,
+      tax filings, employee tax statements (W-2 / W-2C / 1099), tax
+      packages, fulfillments, setup and embedded setup, integration
+      partners, webhook configs, communications, and notifications. All
+      resources are accessed under a versioned, bearer-authenticated REST
+      surface with idempotent writes, bulk operations, pagination, and
+      sandbox simulation endpoints for funding and disbursement.
+    humanURL: https://docs.checkhq.com
+    baseURL: https://api.checkhq.com
+    tags:
+      - Payroll
+      - REST
+      - Webhooks
+      - Tax Filing
+      - Money Movement
+      - Embedded Payroll
+    properties:
+      - type: Documentation
+        url: https://docs.checkhq.com/docs/overview
+      - type: GettingStarted
+        url: https://docs.checkhq.com/docs/quickstart
+      - type: APIReference
+        url: https://docs.checkhq.com/reference
+      - type: Authentication
+        url: https://docs.checkhq.com/reference/authentication
+      - type: RateLimits
+        url: https://docs.checkhq.com/docs/rate-limiting
+      - type: Webhooks
+        url: https://docs.checkhq.com/docs/webhooks-1
+      - type: WebhookEvents
+        url: https://docs.checkhq.com/docs/webhook-event-types
+      - type: Errors
+        url: https://docs.checkhq.com/reference/error-codes
+      - type: Pagination
+        url: https://docs.checkhq.com/docs/pagination
+      - type: Idempotency
+        url: https://docs.checkhq.com/docs/idempotent-requests
+      - type: Sandbox
+        url: https://sandbox.checkhq.com
+      - type: LLMsTxt
+        url: https://docs.checkhq.com/llms.txt
+    authentication:
+      - type: Bearer
+        description: >-
+          Bearer-token authentication via the `Authorization: Bearer
+          <API_KEY>` header. API keys are scoped per environment (sandbox
+          vs. production) and per partner integration.
+    rateLimits:
+      - type: PerSecond
+        value: 25
+        description: 25 requests per second per partner across all API keys.
+      - type: Concurrency
+        value: 100
+        description: 100 concurrent in-flight requests per partner (not configurable).
+      - type: BackoffHeader
+        description: 429 responses include a Retry-After header; RateLimit-Limit and RateLimit-Remaining headers are returned on every authenticated response (IETF RateLimit Headers).
+    features:
+      - name: Embedded Payroll
+        description: Run full-service U.S. payroll for end customers from inside your own product.
+      - name: Companies and Workplaces
+        description: Model employers, EIN verification, and physical workplaces driving tax jurisdictions.
+      - name: Employees and Contractors
+        description: Manage W-2 employees and 1099 contractors, including SSN validation and tax setup.
+      - name: Pay Schedules and Paydays
+        description: Define pay frequencies and compute paydays with bank-holiday-aware approval deadlines.
+      - name: Payroll Preview and Approval
+        description: Create, asynchronously preview, and approve payrolls with explicit warnings and totals.
+      - name: External Payrolls
+        description: Record payrolls processed outside Check for accurate year-to-date and tax filing.
+      - name: Off-Cycle Payrolls
+        description: Schedule one-off payments with configurable benefit and deduction behavior.
+      - name: Earnings Structures
+        description: Custom earning codes and rates, including tipped, piece rate, overtime, and reimbursements.
+      - name: Post-Tax Deductions and Garnishments
+        description: Configure after-tax deductions including child support and other garnishments.
+      - name: Benefits
+        description: Define pre-tax and post-tax employee benefits, including 401(k), health, and HSA.
+      - name: Net Pay Splits
+        description: Split worker net pay across multiple bank accounts per pay period.
+      - name: Bank Accounts and Plaid
+        description: Raw and Plaid-tokenized bank accounts with verification and reveal endpoints.
+      - name: Money Movement
+        description: ACH disbursement, fund-by-wire, payment retries, refunds, NOCs, and failure recovery.
+      - name: Tax Calculation
+        description: Federal, state, and local tax calculation including multi-state withholdings and reciprocity.
+      - name: Tax Filings and Deposits
+        description: Quarterly and annual filings, agency tax deposits, fulfillments, and authorization documents.
+      - name: Employee Tax Statements
+        description: Asynchronous W-2, W-2C, and tax package generation, downloadable as PDF.
+      - name: Paystubs and Paper Checks
+        description: Generate JSON or PDF paystubs and paper checks for employees and contractors.
+      - name: Webhooks
+        description: Resource-scoped event delivery with signature verification and topic-based routing.
+      - name: Embedded Setup
+        description: Delegate full company setup, EIN, tax registration, and prior-payroll migration to Check operators.
+      - name: Sensitive Data API
+        description: Dedicated surface for reveal-style operations on SSNs and bank account numbers.
+      - name: Sandbox Simulation
+        description: Sandbox-only endpoints to complete funding, complete disbursements, or fail funding for tests.
+    useCases:
+      - name: Vertical SaaS Payroll
+        description: Add native payroll to vertical SaaS platforms in trades, hospitality, fitness, and salons.
+      - name: Workforce Management Payroll
+        description: Tightly couple time-tracking and scheduling data with end-to-end payroll runs.
+      - name: HR and PEO Platforms
+        description: Power HR platforms and PEO/ASO-style products without building tax infrastructure.
+      - name: Fintech and Banking
+        description: Couple payroll with banking, EWA, lending, and card products from a single ledger.
+      - name: Accounting Integrations
+        description: Sync payroll journals into accounting systems with workplace and GL breakdowns.
+      - name: Contractor Marketplaces
+        description: Pay 1099 contractors on demand with paper checks, ACH, or split deposits.
+      - name: Multi-State Employers
+        description: Handle reciprocity, courtesy withholdings, and multi-jurisdiction filings at scale.
+    integrations:
+      - name: Plaid
+        description: Bank account linking and ACH verification via Plaid processor tokens.
+      - name: Next Insurance
+        description: Workers' compensation via the Check + Next integration.
+      - name: Clair
+        description: Earned wage access for employees via the Check + Clair integration.
+      - name: SimplyInsured
+        description: Health benefits enrollment via the Check + SimplyInsured component.
+      - name: Vestwell
+        description: 401(k) retirement benefits via the Check + Vestwell integration.
+      - name: Human Interest
+        description: 401(k) retirement benefits via the Check + Human Interest integration.
+      - name: Benbase
+        description: Benefits administration via the Check + Benbase integration.
+      - name: Postman
+        description: First-party Postman environment templates for sandbox testing.
+  - aid: check-hq:components
+    name: Check Components
+    description: >-
+      Check Components is a library of white-labeled, drop-in React UI
+      elements that handle the highest-friction surfaces of embedded
+      payroll — company onboarding, terms of service, bank linking,
+      employee tax setup, withholdings (W-4), filing authorization,
+      verification documents, and Run Payroll — including the Check
+      Onboard flow. Components are embedded via short-lived component
+      links generated through the API and emit DOM events for
+      lifecycle states.
+    humanURL: https://docs.checkhq.com/docs/check-components
+    tags:
+      - React
+      - Embedded UI
+      - Onboarding
+      - Components
+      - Run Payroll
+    properties:
+      - type: Documentation
+        url: https://docs.checkhq.com/docs/check-components
+      - type: ComponentLibrary
+        url: https://docs.checkhq.com/docs/check-component-library
+      - type: Quickstart
+        url: https://docs.checkhq.com/docs/adding-check-onboard-to-your-application
+      - type: APIReference
+        url: https://docs.checkhq.com/reference/components-overview
+      - type: Example
+        url: https://docs.checkhq.com/docs/live-component-example
+    features:
+      - name: Company Onboard
+        description: End-to-end employer onboarding including business details, signatory, and TOS.
+      - name: Run Payroll Component
+        description: White-labeled payroll runner with worker pay, earnings, and preview in one component.
+      - name: Employee Withholdings Setup
+        description: W-4 and state-equivalent withholding form completion for employees.
+      - name: Employee Tax Setup
+        description: Employer-side tax profile capture for individual employees.
+      - name: Company Tax Setup
+        description: Federal and state tax registration capture for the employer.
+      - name: Company Payment Setup
+        description: Plaid bank linking and debit authorization for funding payroll.
+      - name: Company Filing Authorization
+        description: Review, sign, and submit jurisdiction-specific tax authorization forms.
+      - name: Filing Preview Component
+        description: Preview tax returns and filings before submission.
+      - name: Company Verification Documents
+        description: Collect verification documents requested by Check operators.
+      - name: Full Service Setup Submission
+        description: Submit a company to Check operators for full-service embedded setup.
+      - name: Previous Payroll Provider Access
+        description: Capture prior-provider credentials for payroll migration.
+      - name: Component Events
+        description: Components emit lifecycle events such as completion and already-complete states.
+  - aid: check-hq:mcp-server
+    name: Check MCP Server
+    description: >-
+      The Check MCP Server exposes the Check Payroll API to AI tools and
+      agents via the Model Context Protocol. It is offered as both a
+      hosted (remote) endpoint requiring no infrastructure and a
+      self-hosted package for full control of the runtime environment.
+      The server maps Check API operations to MCP tools, allowing
+      natural-language access to companies, employees, payrolls, tax
+      filings, payments, and reports for AI-assisted operator workflows.
+    humanURL: https://docs.checkhq.com/docs/overview-1
+    tags:
+      - MCP
+      - Model Context Protocol
+      - AI
+      - Agents
+    properties:
+      - type: Documentation
+        url: https://docs.checkhq.com/docs/overview-1
+      - type: HostedMCP
+        url: https://docs.checkhq.com/docs/hosted-remote
+      - type: SelfHostedMCP
+        url: https://docs.checkhq.com/docs/self-hosted
+    features:
+      - name: Hosted Remote MCP
+        description: Connect AI tools to Check without managing any infrastructure.
+      - name: Self-Hosted MCP
+        description: Run the MCP server locally with full environment control.
+      - name: Natural Language Payroll Operations
+        description: Query and operate payroll resources using LLM-driven tool calls.
+  - aid: check-hq:cli
+    name: Check CLI
+    description: >-
+      The Check Command-Line Interface is a Python-based CLI installed via
+      the uv package manager that exposes 270 functions across 18
+      resource groups of the Check Payroll API. It is designed for shell
+      scripts, CI/CD pipelines, and ad-hoc data lookups, returning JSON
+      output that composes cleanly with Unix tools such as jq.
+    humanURL: https://docs.checkhq.com/docs/check-command-line-interface-cli
+    tags:
+      - CLI
+      - Python
+      - Automation
+      - CI/CD
+    properties:
+      - type: Documentation
+        url: https://docs.checkhq.com/docs/check-command-line-interface-cli
+      - type: GitHubOrganization
+        url: https://github.com/checkhq
+    features:
+      - name: Full API Coverage
+        description: 270 functions across 18 Check resource groups available as subcommands.
+      - name: JSON Output
+        description: Machine-readable JSON output suitable for jq and shell pipelines.
+      - name: CI/CD Friendly
+        description: Designed for automation in scripts and continuous-delivery pipelines.
+common:
+  - type: Website
+    url: https://www.checkhq.com
+  - type: Documentation
+    url: https://docs.checkhq.com
+  - type: Portal
+    url: https://console.checkhq.com
+  - type: Console
+    url: https://console.checkhq.com/login
+  - type: Sandbox
+    url: https://sandbox.checkhq.com
+  - type: Blog
+    url: https://www.checkhq.com/resources
+  - type: ChangeLog
+    url: https://www.checkhq.com/resources/changelog
+  - type: HelpCenter
+    url: https://help.checkhq.com
+  - type: StatusPage
+    url: https://docs.checkhq.com/docs/status-page
+  - type: GitHubOrganization
+    url: https://github.com/checkhq
+  - type: LLMsTxt
+    url: https://docs.checkhq.com/llms.txt
+  - type: Careers
+    url: https://www.checkhq.com/company/careers
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/check-technologies
+  - type: Crunchbase
+    url: https://www.crunchbase.com/organization/check-2a75
+  - type: Solutions
+    data:
+      - name: Startups
+        description: Drop-in Components let early-stage platforms launch payroll quickly without bespoke UI.
+      - name: Enterprise Platforms
+        description: Flexible API enables deeply customized payroll experiences for large vertical SaaS and workforce platforms.
+      - name: Workforce Management
+        description: Couple scheduling and timekeeping with end-to-end payroll, taxes, and money movement.
+      - name: Vertical SaaS
+        description: Embed native payroll inside industry-specific software for trades, hospitality, fitness, and more.
+      - name: Accounting and Financial Management
+        description: Sync payroll journals and tax events into accounting platforms with workplace breakdowns.
+  - type: Customers
+    data:
+      - name: Homebase
+      - name: ServiceTitan
+      - name: Procare
+      - name: 7shifts
+      - name: Housecall Pro
+      - name: Wave
+      - name: Zoho
+      - name: Keka
+      - name: Zenoti
+      - name: Playground
+      - name: Eddy
+      - name: Miter
+      - name: Trayd
+      - name: Warp
+      - name: Dripos
+  - type: Funding
+    data:
+      - name: Series B
+        description: $35M Series B led by Stripe and Thrive Capital announced at public launch in January 2021.
+      - name: Series C
+        description: $75M Series C led by Stripe announced in 2022.
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com
