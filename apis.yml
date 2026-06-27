@@ -84,7 +84,7 @@ apis:
         url: https://docs.checkhq.com/docs/webhooks-1
       - type: WebhookEvents
         url: https://docs.checkhq.com/docs/webhook-event-types
-      - type: Errors
+      - type: ErrorCodes
         url: https://docs.checkhq.com/reference/error-codes
       - type: Pagination
         url: https://docs.checkhq.com/docs/pagination
@@ -92,7 +92,7 @@ apis:
         url: https://docs.checkhq.com/docs/idempotent-requests
       - type: Sandbox
         url: https://sandbox.checkhq.com
-      - type: LLMsTxt
+      - type: LlmsText
         url: https://docs.checkhq.com/llms.txt
     authentication:
       - type: Bearer
@@ -207,11 +207,11 @@ apis:
         url: https://docs.checkhq.com/docs/check-components
       - type: ComponentLibrary
         url: https://docs.checkhq.com/docs/check-component-library
-      - type: Quickstart
+      - type: GettingStarted
         url: https://docs.checkhq.com/docs/adding-check-onboard-to-your-application
       - type: APIReference
         url: https://docs.checkhq.com/reference/components-overview
-      - type: Example
+      - type: Examples
         url: https://docs.checkhq.com/docs/live-component-example
     features:
       - name: Company Onboard
@@ -315,7 +315,7 @@ common:
     url: https://docs.checkhq.com/docs/status-page
   - type: GitHubOrganization
     url: https://github.com/checkhq
-  - type: LLMsTxt
+  - type: LlmsText
     url: https://docs.checkhq.com/llms.txt
   - type: Careers
     url: https://www.checkhq.com/company/careers
