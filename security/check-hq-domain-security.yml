@@ -1,0 +1,35 @@
+generated: '2026-07-11'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.checkhq.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Aug 16 20:13:41 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: console.checkhq.com
+  https: true
+  tls_version: TLSv1.2
+  cert_expires: Mar  9 23:59:59 2027 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: docs.checkhq.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 23 12:17:29 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+domains:
+- domain: checkhq.com
+  dnssec: false
+  caa:
+  - 0 issue "awstrust.com"
+  - 0 issue "letsencrypt.org"
+  - 0 issue "pki.goog; cansignhttpexchanges=yes"
+  - 0 issuewild "amazon.com"
+  - 0 issuewild "amazonaws.com"
+  - 0 issuewild "amazontrust.com"
+  spf: true
+  dmarc: true
+  dmarc_policy: none

@@ -295,6 +295,10 @@ apis:
       - name: CI/CD Friendly
         description: Designed for automation in scripts and continuous-delivery pipelines.
 common:
+  - type: VulnerabilityDisclosure
+    url: security/check-hq-vulnerability-disclosure.yml
+  - type: DomainSecurity
+    url: security/check-hq-domain-security.yml
   - type: Website
     url: https://www.checkhq.com
   - type: Documentation
