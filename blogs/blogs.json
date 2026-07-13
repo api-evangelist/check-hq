@@ -2,19 +2,11 @@
   "repo": "check-hq",
   "feeds": [
     {
-      "source": "https://www.checkhq.com/resources",
-      "feed_url": "",
-      "saved": 0,
-      "method": "agent-scrape"
-    },
-    {
       "source": "https://sandbox.checkhq.com",
-      "feed_url": "",
-      "saved": 0,
-      "method": "agent-scrape"
+      "error": "HTTPError"
     }
   ],
-  "post_count": 9,
-  "fetched": "2026-06-27T12:31:48Z",
-  "agent_pulled": "2026-06-27"
+  "post_count": 10,
+  "fetched": "2026-07-11T11:50:51Z",
+  "agent_pulled": "2026-07-04"
 }

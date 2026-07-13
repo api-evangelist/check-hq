@@ -41,7 +41,7 @@ tags:
   - Embedded Finance
 url: https://raw.githubusercontent.com/api-evangelist/check-hq/refs/heads/main/apis.yml
 created: '2026-05-25'
-modified: '2026-05-25'
+modified: '2026-07-12'
 specificationVersion: '0.20'
 apis:
   - aid: check-hq:payroll-api
@@ -362,6 +362,12 @@ common:
         description: $35M Series B led by Stripe and Thrive Capital announced at public launch in January 2021.
       - name: Series C
         description: $75M Series C led by Stripe announced in 2022.
+  - name: MCP Server
+    url: https://github.com/check-technologies/mcp-server-check
+    type: MCPServer
+  - name: MCP Documentation
+    url: https://docs.checkhq.com/docs/overview
+    type: MCPDocumentation
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
