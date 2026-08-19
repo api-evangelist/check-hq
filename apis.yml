@@ -53,7 +53,7 @@ tags:
 url: https://raw.githubusercontent.com/api-evangelist/check-hq/refs/heads/main/apis.yml
 created: '2026-05-25'
 modified: '2026-07-12'
-specificationVersion: '0.20'
+specificationVersion: '0.23'
 apis:
   - aid: check-hq:payroll-api
     name: Check Payroll API
