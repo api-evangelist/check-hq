@@ -76,6 +76,13 @@ apis:
     tags:
       - Payroll
       - REST
+      - Webhook
+      - Tax Filing
+      - Money Movement
+      - Embedded Payroll
+    tags_raw:
+      - Payroll
+      - REST
       - Webhooks
       - Tax Filing
       - Money Movement
@@ -261,6 +268,10 @@ apis:
       filings, payments, and reports for AI-assisted operator workflows.
     humanURL: https://docs.checkhq.com/docs/overview-1
     tags:
+      - MCP
+      - Artificial Intelligence
+      - Agents
+    tags_raw:
       - MCP
       - Model Context Protocol
       - AI
