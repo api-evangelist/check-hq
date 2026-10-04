@@ -1,36 +1,34 @@
-# Kin Score artifact — check-hq — 2026-08-24T171257
+# Kin Score artifact — check-hq — 2026-09-25T232841
 # The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
 ---
 kin_score:
   slug: check-hq
-  schema_version: 0.13.0
-  scored_at: '2026-08-24'
-  run_ts: 2026-08-24T171257
-  composite: 13.6
+  schema_version: 0.23.0
+  scored_at: '2026-09-25'
+  run_ts: 2026-09-25T232841
+  composite: 21.1
   band: emerging
   facets:
-    discoverability: 72.2
-    contract_quality: 0.0
-    governance: 0.0
-    operational_transparency: 26.3
-    developer_ergonomics: 25.0
-    commercial_clarity: 0.0
+    discoverability: 71.7
+    contract_quality: 6.4
     contract_governance: 0.0
+    operational_transparency: 34.2
+    developer_ergonomics: 40.5
     access_clarity: 0.0
   agent_readiness:
-    score: 3.5
-    band: human-only
+    score: 24.9
+    band: agent-aware
     dimensions:
       spec_presence: false
       agentic_access: false
       reversibility_documented: false
-      mcp_server: documented
-      auth_clarity: false
-      idempotency: false
-      error_semantics: false
-      openapi_examples: false
-      rate_limit_signal: false
-      event_surface_described: false
+      mcp_server: verified
+      auth_clarity: bearer
+      idempotency: documented
+      error_semantics: documented
+      openapi_examples: documented
+      rate_limit_signal: documented
+      event_surface_described: unknown
       agent_skills: false
       well_known_catalog: false
       consent_identity: false
@@ -42,7 +40,9 @@ kin_score:
       agentic_commerce: false
   regulatory:
     applies: true
-    regime: Payments
-    regime_id: payments
-    score: 18.8
+    regime: Employment & Payroll
+    regime_id: employment_payroll
+    score: 17.6
     matched_via: tags
+  provenance:
+    mcp: first-party
