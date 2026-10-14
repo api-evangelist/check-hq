@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/check-hq/main/json-schema/check-hq-log-schema.json",
+  "title": "Log",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/check-hq-api-openapi.yml#/components/schemas/Log",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "idempotency_key": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "headers": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "response_headers": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "query_params": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "status_code": {
+      "type": "integer"
+    },
+    "processing_duration": {
+      "type": "integer"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "request_body": {
+      "nullable": true
+    },
+    "response_body": {
+      "nullable": true
+    }
+  }
+}

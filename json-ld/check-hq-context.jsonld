@@ -1,0 +1,96 @@
+{
+  "@context": {
+    "@vocab": "https://checkhq.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "check": "https://checkhq.com/schema#",
+    "EarningRate": "check:EarningRate",
+    "id": {
+      "@id": "check:id",
+      "@type": "xsd:string"
+    },
+    "amount": {
+      "@id": "check:amount",
+      "@type": "xsd:string"
+    },
+    "period": {
+      "@id": "check:period",
+      "@type": "xsd:string"
+    },
+    "employee": {
+      "@id": "check:employee",
+      "@type": "xsd:string"
+    },
+    "company": {
+      "@id": "check:company",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "check:name",
+      "@type": "xsd:string"
+    },
+    "workweek_hours": {
+      "@id": "check:workweek_hours",
+      "@type": "xsd:decimal"
+    },
+    "active": {
+      "@id": "check:active",
+      "@type": "xsd:boolean"
+    },
+    "metadata": {
+      "@id": "check:metadata"
+    },
+    "Log": "check:Log",
+    "ip_address": {
+      "@id": "check:ip_address",
+      "@type": "xsd:string"
+    },
+    "path": {
+      "@id": "check:path",
+      "@type": "xsd:string"
+    },
+    "method": {
+      "@id": "check:method",
+      "@type": "xsd:string"
+    },
+    "idempotency_key": {
+      "@id": "check:idempotency_key",
+      "@type": "xsd:string"
+    },
+    "headers": {
+      "@id": "check:headers"
+    },
+    "response_headers": {
+      "@id": "check:response_headers"
+    },
+    "query_params": {
+      "@id": "check:query_params"
+    },
+    "status_code": {
+      "@id": "check:status_code",
+      "@type": "xsd:integer"
+    },
+    "processing_duration": {
+      "@id": "check:processing_duration",
+      "@type": "xsd:integer"
+    },
+    "created_at": {
+      "@id": "check:created_at",
+      "@type": "xsd:string"
+    },
+    "request_body": {
+      "@id": "check:request_body"
+    },
+    "response_body": {
+      "@id": "check:response_body"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Check API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Check's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-14) from openapi/check-hq-api-openapi.yml.",
+  "dcterms:created": "2026-10-14",
+  "dcterms:source": [
+    "openapi/check-hq-api-openapi.yml"
+  ]
+}

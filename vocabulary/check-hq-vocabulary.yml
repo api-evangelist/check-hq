@@ -1,0 +1,21 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/check-hq-api-openapi.yml
+vocabulary:
+  name: Check Domain Vocabulary
+  description: 'Terms declared by Check''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-14'
+  terms:
+  - term: EarningRate
+    definition: 'Object declared by the contract with fields: id, amount, period, employee, company, name, workweek_hours, active, metadata.'
+    tags:
+    - Object
+    source: openapi/check-hq-api-openapi.yml#/components/schemas/EarningRate
+  - term: Log
+    definition: 'Object declared by the contract with fields: id, ip_address, path, method, idempotency_key, headers, response_headers, query_params,
+      status_code, processing_duration, created_at, request_body. (1 more)'
+    tags:
+    - Object
+    source: openapi/check-hq-api-openapi.yml#/components/schemas/Log
