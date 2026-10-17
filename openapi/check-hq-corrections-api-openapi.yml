@@ -1,0 +1,663 @@
+openapi: 3.2.0
+info:
+  title: check-api Corrections API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Corrections
+paths:
+  /corrections:
+    post:
+      summary: Create a correction
+      description: Creates a new correction in the `draft` status.
+      operationId: create-a-correction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - company
+              - year
+              properties:
+                company:
+                  type: string
+                  description: ID of the [company](https://docs.checkhq.com/reference/company) whose pay history is being corrected.
+                year:
+                  type: integer
+                  description: The tax year the correction applies to. All payrolls attached to the correction must belong to this tax year.
+                description:
+                  type: string
+                  description: A human-readable description of the correction.
+                metadata:
+                  type: object
+                  description: Arbitrary key-value data to attach to the correction.
+                settlement_date:
+                  type: string
+                  format: date
+                  description: The CFT settlement date for the correction's money movement. Must be a valid banking day on or after the earliest date ACH can still reach for settlement. Any later banking day is allowed. Optional at creation; if omitted, a date is chosen when the correction is approved.
+                bank_account:
+                  type: string
+                  description: ID of the [bank account](https://docs.checkhq.com/reference/bank-accounts-1) to debit or credit at fulfillment. Must belong to the correction's company. Optional; if omitted or `null`, Check stamps the company's current default bank account.
+                simulation_mode:
+                  type: string
+                  enum:
+                  - automatic
+                  - manual
+                  description: Sandbox-only. How the correction moves through money movement after approval. One of `automatic` or `manual`. Omitted or `null` defaults to `automatic`. Returns a validation error in production.
+      responses:
+        '201':
+          description: '201'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"settlement_date\": null,\n  \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n  \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n  \"metadata\": {\n    \"external_id\": \"abc-123\"\n  },\n  \"operations\": [],\n  \"totals\": null,\n  \"preview\": null,\n  \"approval\": null,\n  \"reopen_deadline\": null,\n  \"simulation_mode\": \"automatic\",\n  \"created_at\": \"2026-06-24T18:26:56.848920Z\"\n}"
+      deprecated: false
+      tags:
+      - Corrections
+    get:
+      summary: List corrections
+      description: Returns a paginated list of corrections.
+      operationId: list-corrections
+      parameters:
+      - name: company
+        in: query
+        description: Filter to corrections belonging to a single company.
+        schema:
+          type: string
+      - name: year
+        in: query
+        description: Filter to corrections for a single tax year.
+        schema:
+          type: integer
+          format: int32
+      - name: status
+        in: query
+        description: Filter to corrections with this status.
+        schema:
+          type: string
+          enum:
+          - draft
+          - pending
+          - processing
+          - settled
+          - failed
+      - name: payroll
+        in: query
+        description: Filter to corrections that include the given payroll as a member.
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of corrections returned per page. The maximum value is 100.
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: query
+        description: Filter the list to the specified IDs. For more details, check out the [Bulk Get Requests guide](https://docs.checkhq.com/docs/bulk-resource-get-requests).
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n      \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n      \"year\": 2026,\n      \"status\": \"draft\",\n      \"settlement_date\": \"2026-07-15\",\n      \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n      \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n      \"metadata\": {\n        \"external_id\": \"abc-123\"\n      },\n      \"created_at\": \"2026-06-24T18:26:56.848920Z\",\n      \"updated_at\": \"2026-06-24T18:26:56.848920Z\",\n      \"created_by\": \"partner@example.com\"\n    }\n  ]\n}"
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}:
+    get:
+      summary: Get a correction
+      description: Retrieves an existing correction.
+      operationId: get-a-correction
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"settlement_date\": \"2026-07-15\",\n  \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n  \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n  \"metadata\": {\n    \"external_id\": \"abc-123\"\n  },\n  \"operations\": [\n    {\n      \"operation\": \"void_payroll\",\n      \"creates\": \"pay_Mt7cJqXcVfW2yPKhBvsN\",\n      \"corrects\": \"pay_OriginalVoidedPayroll\"\n    },\n    {\n      \"operation\": \"add_payroll\",\n      \"creates\": \"pay_Vg3RvNwqLpTz8oYaGdQE\",\n      \"corrects\": null\n    },\n    {\n      \"operation\": \"balance_quarter\",\n      \"creates\": \"pay_Jd9nWuBqOxSz5eKmCvhT\",\n      \"corrects\": \"pay_OriginalBalancingPayroll\"\n    }\n  ],\n  \"totals\": null,\n  \"preview\": null,\n  \"approval\": null,\n  \"reopen_deadline\": null,\n  \"simulation_mode\": \"automatic\",\n  \"created_at\": \"2026-06-24T18:26:56.848920Z\"\n}"
+      deprecated: false
+      tags:
+      - Corrections
+    patch:
+      summary: Update a correction
+      description: Updates an existing draft correction. Only `description`, `settlement_date`, `bank_account`, `metadata`, and `simulation_mode` may be updated.
+      operationId: update-a-correction
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction to update
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: A human-readable description of the correction.
+                metadata:
+                  type: object
+                  description: Arbitrary key-value data to attach to the correction.
+                settlement_date:
+                  type: string
+                  format: date
+                  description: The CFT settlement date for the correction's money movement. Must be a valid banking day on or after the earliest date ACH can still reach for settlement. Any later banking day is allowed.
+                bank_account:
+                  type: string
+                  description: Settable while the correction is in `draft`. ID of the [bank account](https://docs.checkhq.com/reference/bank-accounts-1) to debit or credit at fulfillment. Must belong to the correction's company. An explicit `null` re-stamps the company's current default bank account.
+                simulation_mode:
+                  type: string
+                  enum:
+                  - automatic
+                  - manual
+                  description: Sandbox-only. Settable while the correction is in `draft`. One of `automatic` or `manual`. Omitted leaves the mode unchanged; `null` resets to the default (`automatic`). Returns a validation error in production.
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"settlement_date\": \"2026-07-20\",\n  \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n  \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n  \"metadata\": {},\n  \"operations\": [\n    {\n      \"operation\": \"void_payroll\",\n      \"creates\": \"pay_Mt7cJqXcVfW2yPKhBvsN\",\n      \"corrects\": \"pay_OriginalVoidedPayroll\"\n    },\n    {\n      \"operation\": \"add_payroll\",\n      \"creates\": \"pay_Vg3RvNwqLpTz8oYaGdQE\",\n      \"corrects\": null\n    }\n  ],\n  \"totals\": null,\n  \"preview\": null,\n  \"approval\": null,\n  \"reopen_deadline\": null,\n  \"simulation_mode\": \"automatic\",\n  \"created_at\": \"2026-06-24T18:26:56.848920Z\"\n}"
+      deprecated: false
+      tags:
+      - Corrections
+    delete:
+      summary: Delete a correction
+      description: Deletes a draft correction and all draft payrolls attached to it.
+      operationId: delete-a-correction
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction to delete
+        schema:
+          type: string
+        required: true
+      responses:
+        '204':
+          description: '204'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: ''
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/approve:
+    post:
+      summary: Approve a correction
+      description: 'Approves a correction, scheduling its money movement to be processed on the correction''s `settlement_date`. Fully asynchronous: the endpoint returns `202 Accepted` with `approval` set to `calculating` while a drift check and promotion run. When the approval succeeds, `status` moves to `pending`; if the plan drifted, `approval.error_code` is `fulfillment_changed` and the correction remains in `draft` with refreshed `totals`.'
+      operationId: approve-a-correction
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction to approve
+        schema:
+          type: string
+        required: true
+      responses:
+        '202':
+          description: '202'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"settlement_date\": \"2026-07-15\",\n  \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n  \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n  \"metadata\": {},\n  \"operations\": [\n    {\n      \"operation\": \"void_payroll\",\n      \"creates\": \"pay_Mt7cJqXcVfW2yPKhBvsN\",\n      \"corrects\": \"pay_OriginalVoidedPayroll\"\n    },\n    {\n      \"operation\": \"add_payroll\",\n      \"creates\": \"pay_Vg3RvNwqLpTz8oYaGdQE\",\n      \"corrects\": null\n    }\n  ],\n  \"totals\": {\n    \"cash_requirement\": \"150.00\",\n    \"cash_requirement_waived\": \"0.00\",\n    \"agency_refundable\": \"25.00\"\n  },\n  \"preview\": {\n    \"status\": \"succeeded\",\n    \"started_at\": \"2026-06-24T19:02:11.512303Z\",\n    \"messages\": null\n  },\n  \"approval\": {\n    \"status\": \"calculating\",\n    \"started_at\": \"2026-06-24T19:15:42.881204Z\",\n    \"error_code\": null\n  },\n  \"reopen_deadline\": \"2026-07-14T15:00:00Z\",\n  \"simulation_mode\": \"automatic\",\n  \"created_at\": \"2026-06-24T18:26:56.848920Z\"\n}"
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/preview:
+    post:
+      summary: Preview a correction
+      description: Starts an asynchronous preview of a correction, which rebalances impacted closed quarters and prices the correction without moving money.
+      operationId: preview-a-correction
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction to preview
+        schema:
+          type: string
+        required: true
+      responses:
+        '202':
+          description: '202'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"settlement_date\": \"2026-07-15\",\n  \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n  \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n  \"metadata\": {},\n  \"operations\": [\n    {\n      \"operation\": \"void_payroll\",\n      \"creates\": \"pay_Mt7cJqXcVfW2yPKhBvsN\",\n      \"corrects\": \"pay_OriginalVoidedPayroll\"\n    },\n    {\n      \"operation\": \"add_payroll\",\n      \"creates\": \"pay_Vg3RvNwqLpTz8oYaGdQE\",\n      \"corrects\": null\n    }\n  ],\n  \"totals\": null,\n  \"preview\": {\n    \"status\": \"calculating\",\n    \"started_at\": \"2026-06-24T19:02:11.512303Z\",\n    \"messages\": null\n  },\n  \"approval\": null,\n  \"reopen_deadline\": null,\n  \"simulation_mode\": \"automatic\",\n  \"created_at\": \"2026-06-24T18:26:56.848920Z\"\n}"
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/receipt:
+    get:
+      summary: Get a correction receipt
+      description: 'Returns a tax rollup for a correction after a successful preview. The response includes money-movement totals and one entry per tax the correction moved, with each operation split into amounts Check remits and amounts the company remits outside Check.
+
+
+        Does not return a file URL; use `GET /corrections/{correction}/receipt_download` to download the receipt PDF.
+
+
+        If the correction has not been previewed, returns `400` with error type `correction_not_previewed`. Taxes with no net movement are omitted from `taxes`.'
+      operationId: get-a-correction-receipt
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"totals\": {\n    \"cash_requirement\": \"23.50\",\n    \"cash_requirement_waived\": \"0.00\",\n    \"agency_refundable\": \"0.00\",\n    \"company_responsibility\": \"0.00\"\n  },\n  \"taxes\": [\n    {\n      \"tax\": \"tax_8kQm2pLxNvRwYhJdFsAe\",\n      \"tax_label\": \"Federal Income Tax\",\n      \"jurisdiction\": \"US\",\n      \"agency\": null,\n      \"agency_label\": null,\n      \"voided\": {\n        \"check\": \"-235.00\",\n        \"company\": \"0.00\"\n      },\n      \"added\": {\n        \"check\": \"258.50\",\n        \"company\": \"0.00\"\n      },\n      \"balanced\": {\n        \"check\": \"0.00\",\n        \"company\": \"0.00\"\n      },\n      \"reassigned\": {\n        \"check\": \"0.00\",\n        \"company\": \"0.00\"\n      },\n      \"cash_requirement\": \"23.50\",\n      \"cash_requirement_waived\": \"0.00\",\n      \"agency_refundable\": \"0.00\",\n      \"company_responsibility\": \"0.00\"\n    }\n  ]\n}"
+        '400':
+          description: The correction has not been successfully previewed.
+          content:
+            application/json:
+              examples:
+                Not previewed:
+                  value: "{\n  \"error\": {\n    \"type\": \"correction_not_previewed\",\n    \"message\": \"Preview this correction to generate its receipt.\"\n  }\n}"
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/receipt_download:
+    get:
+      summary: Download a correction receipt
+      description: 'Returns a short-lived URL to download the correction receipt PDF. Requires a successful preview. Each call mints a fresh URL.
+
+
+        If the correction has not been previewed, returns `400` with error type `correction_not_previewed`. If preview succeeded but the PDF artifact is not available, returns `404`.'
+      operationId: get-a-correction-receipt-download
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"download_url\": \"https://check-receipts.s3.amazonaws.com/correction-receipt.pdf?X-Amz-Expires=1800\",\n  \"content_type\": \"application/pdf\",\n  \"expires_at\": \"2026-06-24T19:30:00Z\"\n}"
+        '400':
+          description: The correction has not been successfully previewed.
+          content:
+            application/json:
+              examples:
+                Not previewed:
+                  value: "{\n  \"error\": {\n    \"type\": \"correction_not_previewed\",\n    \"message\": \"Preview this correction to generate its receipt.\"\n  }\n}"
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/reopen:
+    post:
+      summary: Reopen a correction
+      description: Reopens a pending correction, returning it to `draft` so additional adjustments can be made.
+      operationId: reopen-a-correction
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction to reopen
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"cor_Bw6EkMDmxCPeVQ2eYzLu\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"settlement_date\": \"2026-07-15\",\n  \"bank_account\": \"bnk_iPiAA7RDadr3gGMa2cvq\",\n  \"description\": \"Void and replace 3/31 payroll for J. Smith\",\n  \"metadata\": {},\n  \"operations\": [\n    {\n      \"operation\": \"void_payroll\",\n      \"creates\": \"pay_Mt7cJqXcVfW2yPKhBvsN\",\n      \"corrects\": \"pay_OriginalVoidedPayroll\"\n    },\n    {\n      \"operation\": \"add_payroll\",\n      \"creates\": \"pay_Vg3RvNwqLpTz8oYaGdQE\",\n      \"corrects\": null\n    }\n  ],\n  \"totals\": null,\n  \"preview\": null,\n  \"approval\": null,\n  \"reopen_deadline\": null,\n  \"simulation_mode\": \"automatic\",\n  \"created_at\": \"2026-06-24T18:26:56.848920Z\"\n}"
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/simulate/complete_funding:
+    post:
+      summary: '[Sandbox] Complete correction funding'
+      description: Complete funding for a correction's company funds transfer. Sandbox-only. Returns an empty body; fetch the correction for its updated status.
+      operationId: sandbox-correction-complete-funding
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/simulate/fail_funding:
+    post:
+      summary: '[Sandbox] Fail correction funding'
+      description: Fail funding for a correction's company funds transfer. Sandbox-only. Returns an empty body; fetch the correction for its updated status.
+      operationId: sandbox-correction-fail-funding
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Corrections
+  /corrections/{correction}/simulate/start_processing:
+    post:
+      summary: '[Sandbox] Start correction processing'
+      description: Start processing for a correction's money movement. Sandbox-only. Returns an empty body; fetch the correction for its updated status.
+      operationId: sandbox-correction-start-processing
+      parameters:
+      - name: correction
+        in: path
+        description: ID of the correction
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Corrections
+components:
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

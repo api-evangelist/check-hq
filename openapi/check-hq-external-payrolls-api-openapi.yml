@@ -1,0 +1,800 @@
+openapi: 3.2.0
+info:
+  title: check-api External Payrolls API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: External Payrolls
+paths:
+  /external_payrolls:
+    get:
+      summary: List external payrolls
+      description: ''
+      operationId: list-external-payrolls
+      parameters:
+      - name: id
+        in: query
+        description: ID(s) of the payroll to return.
+        schema:
+          type: string
+      - name: company
+        in: query
+        description: Return payrolls for this [company](https://docs.checkhq.com/reference/company) ID.
+        schema:
+          type: string
+      - name: pay_schedule
+        in: query
+        description: Return payrolls for this [pay schedule](https://docs.checkhq.com/reference/the-pay-schedule-object)
+        schema:
+          type: string
+      - name: include_items
+        in: query
+        description: When `false`, return a summary representation that omits embedded `items` and `contractor_payments` from each payroll.
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - External Payrolls
+    post:
+      summary: Create an external payroll
+      description: Creates an external payroll. Pass `correction` to create a replacement external payroll and attach it to a draft correction in the same request. This is the historical-payroll counterpart to Create a payroll with `correction`.
+      operationId: create-an-external-payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - company
+              - period_start
+              - period_end
+              - payday
+              properties:
+                company:
+                  type: string
+                  description: ID of the company this external payroll is for.
+                period_start:
+                  type: string
+                  description: The start of the date range that the payroll covers.
+                  format: date
+                period_end:
+                  type: string
+                  description: The end of the date range that the payroll covers.
+                  format: date
+                payday:
+                  type: string
+                  description: The date on which employees were paid for the payroll. When `correction` is supplied, `payday` must be in the past, before the company's `start_date`, and within the correction's tax year.
+                  format: date
+                pay_frequency:
+                  type: string
+                  description: Frequency at which the external payroll was paid
+                correction:
+                  type: string
+                  description: ID of the draft [correction](https://docs.checkhq.com/reference/the-correction-object) to attach this external payroll to as a replacement when creating the payroll. Returned on external payroll responses as the correction this payroll is an operation of, or `null`. On update, may be included only to restate the payroll's current correction ID — a different value is rejected. Omit for ordinary external payrolls. When supplied at create, the company must have run a managed payroll; `payday` must be in the past and before the company's `start_date`; and the correction must be in `draft`, belong to the same company, and accept replacement payrolls. Allows creating an external payroll replacement for a company that otherwise could not use the external payroll API for that tax year. Requires `correction:write` or `correction:admin` scope to attach at create.
+                items:
+                  type: array
+                  description: The set of [external payroll items](https://docs.checkhq.com/reference/external-payroll-item-object) associated with the payroll.
+                  items:
+                    properties:
+                      employee:
+                        type: string
+                        description: ID of the employee that was paid
+                      earnings:
+                        type: array
+                        items:
+                          properties:
+                            amount:
+                              type: string
+                              description: Amount paid out on this payroll
+                            hours:
+                              type: string
+                              description: Hours worked on this payroll
+                            type:
+                              type: string
+                              description: Earning type, one of [Earning Types](https://docs.checkhq.com/reference/types-of-earnings)
+                            workplace:
+                              type: string
+                              description: ID of workplace that the earning was worked at
+                            earning_code:
+                              type: string
+                              description: ID of the custom earning code used for this earning. Either this or `type` must be provided.
+                          type: object
+                      reimbursements:
+                        type: array
+                        items:
+                          properties:
+                            amount:
+                              type: string
+                              description: Amount reimbursed
+                          required:
+                          - amount
+                          type: object
+                      taxes:
+                        type: array
+                        items:
+                          properties:
+                            tax:
+                              type: string
+                              description: ID of the tax paid
+                            amount:
+                              type: string
+                              description: Amount paid in this tax
+                          required:
+                          - tax
+                          - amount
+                          type: object
+                      benefits:
+                        type: array
+                        items:
+                          properties:
+                            id:
+                              type: string
+                              description: ID of the benefit object that represents this deduction. One of `ID` or `benefit` must be provided.
+                            benefit:
+                              type: string
+                              description: The [benefit type](https://docs.checkhq.com/reference/types-of-benefits) of this deduction. Either `id` or `benefit` must be provided.
+                            description:
+                              type: string
+                              description: Description of the benefit provided. If ID is provided, this field will not take effect and instead be superseded by the benefit object's description.
+                            employee_contribution_amount:
+                              type: string
+                              description: Amount the employee contributed to the benefit for this payroll
+                            company_contribution_amount:
+                              type: string
+                              description: Amount the company contributed to this benefit for this payroll
+                          type: object
+                      post_tax_deductions:
+                        type: array
+                        items:
+                          properties:
+                            id:
+                              type: string
+                              description: ID of the post-tax deduction deducted from pay. Either this or `description` must be provided.
+                            amount:
+                              type: string
+                              description: Amount deducted from pay
+                            description:
+                              type: string
+                              description: Description of the post-tax deduction deducted. Either this or `id` must be provided.
+                          type: object
+                    type: object
+                contractor_payments:
+                  type: array
+                  description: The set of [contractor payments](https://docs.checkhq.com/reference/the-contractor-payment-object) associated with the payroll.
+                  items:
+                    properties:
+                      amount:
+                        type: string
+                        description: Amount paid to this contractor
+                      reimbursement_amount:
+                        type: string
+                        description: Amount reimbursed to the contractor
+                      contractor:
+                        type: string
+                        description: ID of the contractor paid
+                    type: object
+                metadata:
+                  type: string
+                  description: Additional loosely structured information to associate with the payroll. Values must be string.
+                  format: json
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"pay_Z26PNMC7Ky1wfFQzVqfF\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"period_start\": \"2019-06-16\",\n  \"period_end\": \"2019-06-29\",\n  \"approved_at\": \"2019-06-29T18:26:56.848920Z\",\n  \"payday\": \"2019-07-05\",\n  \"status\": \"paid\",\n  \"pay_frequency\": \"biweekly\",,\n  \"items\": [\n    {\n      \"id\": \"itm_yvmmsVGFxLoBaMIkqzea\",\n      \"payroll\": \"pay_Z26PNMC7Ky1wfFQzVqfF\",\n      \"employee\": \"emp_zGGp6wYcxAeu1Ng8IA7v\",\n      \"payment_method\": \"direct_deposit\",\n      \"net_pay\": \"712.31\",\n      \"earnings\": [\n        {\n          \"amount\": \"961.54\",\n          \"hours\": 40.0,\n          \"type\": \"regular\",\n          \"workplace\": \"wrk_cxcG4vjGKcSXZk1fgKai\",\n          \"code\": null,\n          \"description\": null\n        }\n      ],\n      \"reimbursements\": [],\n      \"taxes\": [\n        {\n          \"tax\": \"tax_I1Z9zqbBGWIbvlZpN2Vq\",\n          \"description\": \"New York SDI\",\n          \"amount\": \"0.60\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_ImvSF9CTuMdokf0uwx5x\",\n          \"description\": \"Employer FICA Tax\",\n          \"amount\": \"59.62\",\n          \"payer\": \"company\"\n        },\n        {\n          \"tax\": \"tax_yjNkKk061BTipYv7G4Ti\",\n          \"description\": \"New York City Tax\",\n          \"amount\": \"31.04\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_S1krAkh75RzdWu5J53HA\",\n          \"description\": \"New York State Tax\",\n          \"amount\": \"44.20\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_UJrIQbtVErbdez0bYTVN\",\n          \"description\": \"New York Family Leave Benefits\",\n          \"amount\": \"1.47\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_1XHqR9Qf5t18SD2sfYEe\",\n          \"description\": \"Medicare\",\n          \"amount\": \"13.94\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_8L3JLfsH4X6dp0maBWfW\",\n          \"description\": \"Federal Income Tax\",\n          \"amount\": \"98.36\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_ibU8cGhC5OlpOjoQFIXV\",\n          \"description\": \"FICA\",\n          \"amount\": \"59.62\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_O3f21hkS1cvHBZTa61BO\",\n          \"description\": \"Employer Medicare Tax\",\n          \"amount\": \"13.94\",\n          \"payer\": \"company\"\n        }\n      ],\n      \"benefits\": [],\n      \"post_tax_deductions\": [],\n    }\n  ],\n  \"contractor_payments\": [\n    {\n      \"contractor\": \"ctr_90QzaH9xPRI7JRLXnRoU\",\n      \"amount\": \"100.00\",\n      \"reimbursement_amount\": \"15.00\"\n    }\n  ],\n}"
+      deprecated: false
+      tags:
+      - External Payrolls
+  /external_payrolls/{external_payroll}/preview:
+    get:
+      summary: Preview an external payroll
+      description: ''
+      operationId: preview-an-external-payroll
+      parameters:
+      - name: external_payroll
+        in: path
+        description: ID of the external payroll to preview.
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - External Payrolls
+  /external_payrolls/{payroll}:
+    get:
+      summary: Get an external payroll
+      description: ''
+      operationId: get-an-external-payroll
+      parameters:
+      - name: payroll
+        in: path
+        description: ID of the payroll to return.
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - External Payrolls
+    patch:
+      summary: Update an external payroll
+      description: 'Updates an external payroll. For external payrolls attached to a correction as replacements, `payday` may change only within the same bounds enforced at creation: in the past, before the company''s `start_date`, and within the correction''s tax year. `correction` may be included only to restate the payroll''s current correction ID; matching the current value is accepted as a no-op. A different value is rejected.'
+      operationId: update-an-external-payroll
+      parameters:
+      - name: payroll
+        in: path
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company:
+                  type: string
+                  description: ID of the company this external payroll is for.
+                period_start:
+                  type: string
+                  description: The start of the date range that the payroll covers.
+                  format: date
+                period_end:
+                  type: string
+                  description: The end of the date range that the payroll covers.
+                  format: date
+                payday:
+                  type: string
+                  description: The date on which employees were paid for the payroll. For payrolls attached to a correction, must remain in the past, before the company's `start_date`, and within the correction's tax year.
+                  format: date
+                pay_frequency:
+                  type: string
+                  description: Frequency at which the external payroll was paid
+                correction:
+                  type: string
+                  description: May be included only to restate this payroll's current correction ID; matching the current value is accepted as a no-op. A different value is rejected. Omitted leaves the correction unchanged.
+                items:
+                  type: array
+                  description: The set of [external payroll items](https://docs.checkhq.com/reference/external-payroll-item-object) associated with the payroll.
+                  items:
+                    properties:
+                      employee:
+                        type: string
+                        description: ID of the employee that was paid
+                      earnings:
+                        type: array
+                        items:
+                          properties:
+                            amount:
+                              type: string
+                              description: Amount paid out on this payroll
+                            hours:
+                              type: string
+                              description: Hours worked on this payroll
+                            type:
+                              type: string
+                              description: Earning type, one of [Earning Types](https://docs.checkhq.com/reference/types-of-earnings)
+                            workplace:
+                              type: string
+                              description: ID of workplace that the earning was worked at
+                            earning_code:
+                              type: string
+                              description: ID of the custom earning code used for this earning. Either this or `type` must be provided.
+                          type: object
+                      reimbursements:
+                        type: array
+                        items:
+                          properties:
+                            amount:
+                              type: string
+                              description: Amount reimbursed
+                          required:
+                          - amount
+                          type: object
+                      taxes:
+                        type: array
+                        items:
+                          properties:
+                            tax:
+                              type: string
+                              description: ID of the tax paid
+                            amount:
+                              type: string
+                              description: Amount paid in this tax
+                          required:
+                          - tax
+                          - amount
+                          type: object
+                      benefits:
+                        type: array
+                        items:
+                          properties:
+                            id:
+                              type: string
+                              description: ID of the benefit object that represents this deduction. One of `ID` or `benefit` must be provided.
+                            benefit:
+                              type: string
+                              description: The [benefit type](https://docs.checkhq.com/reference/types-of-benefits) of this deduction. Either `id` or `benefit` must be provided.
+                            description:
+                              type: string
+                              description: Description of the benefit provided. If ID is provided, this field will not take effect and instead be superseded by the benefit object's description.
+                            employee_contribution_amount:
+                              type: string
+                              description: Amount the employee contributed to the benefit for this payroll
+                            company_contribution_amount:
+                              type: string
+                              description: Amount the company contributed to this benefit for this payroll
+                          type: object
+                      post_tax_deductions:
+                        type: array
+                        items:
+                          properties:
+                            id:
+                              type: string
+                              description: ID of the post-tax deduction deducted from pay. Either this or `description` must be provided.
+                            amount:
+                              type: string
+                              description: Amount deducted from pay
+                            description:
+                              type: string
+                              description: Description of the post-tax deduction deducted. Either this or `id` must be provided.
+                          type: object
+                    type: object
+                contractor_payments:
+                  type: array
+                  description: The set of [contractor payments](https://docs.checkhq.com/reference/the-contractor-payment-object) associated with the payroll.
+                  items:
+                    properties:
+                      amount:
+                        type: string
+                        description: Amount paid to this contractor
+                      reimbursement_amount:
+                        type: string
+                        description: Amount reimbursed to the contractor
+                      contractor:
+                        type: string
+                        description: ID of the contractor paid
+                    type: object
+                metadata:
+                  type: string
+                  description: Additional loosely structured information to associate with the payroll. Values must be string.
+                  format: json
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"pay_Z26PNMC7Ky1wfFQzVqfF\",\n  \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n  \"period_start\": \"2019-06-16\",\n  \"period_end\": \"2019-06-29\",\n  \"approved_at\": \"2019-06-29T18:26:56.848920Z\",\n  \"payday\": \"2019-07-05\",\n  \"status\": \"paid\",\n  \"pay_frequency\": \"biweekly\",,\n  \"items\": [\n    {\n      \"id\": \"itm_yvmmsVGFxLoBaMIkqzea\",\n      \"payroll\": \"pay_Z26PNMC7Ky1wfFQzVqfF\",\n      \"employee\": \"emp_zGGp6wYcxAeu1Ng8IA7v\",\n      \"payment_method\": \"direct_deposit\",\n      \"net_pay\": \"712.31\",\n      \"earnings\": [\n        {\n          \"amount\": \"961.54\",\n          \"hours\": 40.0,\n          \"type\": \"regular\",\n          \"workplace\": \"wrk_cxcG4vjGKcSXZk1fgKai\",\n          \"code\": null,\n          \"description\": null\n        }\n      ],\n      \"reimbursements\": [],\n      \"taxes\": [\n        {\n          \"tax\": \"tax_I1Z9zqbBGWIbvlZpN2Vq\",\n          \"description\": \"New York SDI\",\n          \"amount\": \"0.60\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_ImvSF9CTuMdokf0uwx5x\",\n          \"description\": \"Employer FICA Tax\",\n          \"amount\": \"59.62\",\n          \"payer\": \"company\"\n        },\n        {\n          \"tax\": \"tax_yjNkKk061BTipYv7G4Ti\",\n          \"description\": \"New York City Tax\",\n          \"amount\": \"31.04\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_S1krAkh75RzdWu5J53HA\",\n          \"description\": \"New York State Tax\",\n          \"amount\": \"44.20\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_UJrIQbtVErbdez0bYTVN\",\n          \"description\": \"New York Family Leave Benefits\",\n          \"amount\": \"1.47\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_1XHqR9Qf5t18SD2sfYEe\",\n          \"description\": \"Medicare\",\n          \"amount\": \"13.94\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_8L3JLfsH4X6dp0maBWfW\",\n          \"description\": \"Federal Income Tax\",\n          \"amount\": \"98.36\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_ibU8cGhC5OlpOjoQFIXV\",\n          \"description\": \"FICA\",\n          \"amount\": \"59.62\",\n          \"payer\": \"employee\"\n        },\n        {\n          \"tax\": \"tax_O3f21hkS1cvHBZTa61BO\",\n          \"description\": \"Employer Medicare Tax\",\n          \"amount\": \"13.94\",\n          \"payer\": \"company\"\n        }\n      ],\n      \"benefits\": [],\n      \"post_tax_deductions\": [],\n    }\n  ],\n  \"contractor_payments\": [\n    {\n      \"contractor\": \"ctr_90QzaH9xPRI7JRLXnRoU\",\n      \"amount\": \"100.00\",\n      \"reimbursement_amount\": \"15.00\"\n    }\n  ],\n}"
+      deprecated: false
+      tags:
+      - External Payrolls
+    delete:
+      summary: Delete an external payroll
+      description: Deletes an external payroll.
+      operationId: delete-a-payroll-copy-1
+      parameters:
+      - name: payroll
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '204':
+          description: '204'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: ''
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - External Payrolls
+  /external_payrolls/{payroll}/approve:
+    post:
+      summary: Approve an external payroll
+      description: Approves an external payroll.
+      operationId: approve-an-external-payroll
+      parameters:
+      - name: payroll
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: ''
+      deprecated: false
+      tags:
+      - External Payrolls
+  /external_payrolls/{payroll}/reopen:
+    post:
+      summary: Reopen an external payroll
+      description: Moves an approved external payroll's status to draft, allowing you to make further edits to the payroll or its items.
+      operationId: reopen-a-pending-payroll
+      parameters:
+      - name: payroll
+        in: path
+        description: ID of the payroll to reopen
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: ''
+      deprecated: false
+      tags:
+      - External Payrolls
+  /external_payrolls/{payroll}/validate:
+    get:
+      summary: Validate an external payroll
+      description: 'Runs the checks that approving an external payroll runs, without approving the payroll. Use it to find problems with a draft external payroll before you approve it. It does not approve the payroll or change its status.
+
+
+        Validate doesn''t recalculate the payroll. Use it to check for errors quickly while you fix a payroll, and use preview to review calculated amounts before you approve.
+
+
+        If every check passes, the response is the external payroll object. If any check fails, the response is a `400` `validation_error`, with one entry in `input_errors` for each problem found.
+
+
+        Validate does not run the negative quarter-to-date tax check. That check runs only when you approve, so an approve request can still fail after a validate request succeeds.'
+      operationId: validate-an-external-payroll
+      parameters:
+      - name: payroll
+        in: path
+        description: ID of the external payroll to validate.
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"pay_Z26PNMC7Ky1wfFQzVqfF\",\n    \"company\": \"com_sx3svU6K8c5ZkSFlOh5p\",\n    \"period_start\": \"2019-06-16\",\n    \"period_end\": \"2019-06-29\",\n    \"approved_at\": null,\n    \"payday\": \"2019-07-05\",\n    \"status\": \"draft\",\n    \"pay_frequency\": \"biweekly\",\n    \"items\": [\n        {\n            \"id\": \"itm_yvmmsVGFxLoBaMIkqzea\",\n            \"payroll\": \"pay_Z26PNMC7Ky1wfFQzVqfF\",\n            \"employee\": \"emp_zGGp6wYcxAeu1Ng8IA7v\",\n            \"earnings\": [\n                {\n                    \"amount\": \"961.54\",\n                    \"hours\": 40.0,\n                    \"type\": \"hourly\",\n                    \"workplace\": \"wrk_cxcG4vjGKcSXZk1fgKai\"\n                }\n            ],\n            \"reimbursements\": [],\n            \"taxes\": [\n                {\n                    \"tax\": \"tax_ImvSF9CTuMdokf0uwx5x\",\n                    \"amount\": \"59.62\"\n                },\n                {\n                    \"tax\": \"tax_O3f21hkS1cvHBZTa61BO\",\n                    \"amount\": \"13.94\"\n                }\n            ],\n            \"benefits\": [],\n            \"post_tax_deductions\": []\n        }\n    ],\n    \"contractor_payments\": [],\n    \"metadata\": {}\n}"
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"error\": {\n        \"type\": \"validation_error\",\n        \"message\": \"Please correct the required fields and try again.\",\n        \"input_errors\": [\n            {\n                \"message\": \"Non-zero hours must be provided for hourly earnings\",\n                \"field\": \"hours\",\n                \"field_path\": [\n                    \"items\",\n                    \"1\",\n                    \"earnings\",\n                    \"0\",\n                    \"hours\"\n                ]\n            }\n        ]\n    }\n}"
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: validation_error
+                      message:
+                        type: string
+                        example: Please correct the required fields and try again.
+                      input_errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Non-zero hours must be provided for hourly earnings
+                            field:
+                              type: string
+                              example: hours
+                            field_path:
+                              type: array
+                              items:
+                                type: string
+                              example:
+                              - items
+                              - '1'
+                              - earnings
+                              - '0'
+                              - hours
+      deprecated: false
+      tags:
+      - External Payrolls
+components:
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

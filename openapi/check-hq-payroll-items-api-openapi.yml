@@ -1,0 +1,520 @@
+openapi: 3.2.0
+info:
+  title: check-api Payroll Items API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Payroll Items
+paths:
+  /payroll_items:
+    post:
+      summary: Create a payroll item
+      description: Creates a payroll item.
+      operationId: create-a-payroll-item
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - payroll
+              - employee
+              properties:
+                payroll:
+                  type: string
+                  description: The payroll ID associated with the payroll item.
+                employee:
+                  type: string
+                  description: The employee ID associated with the payroll item.
+                payment_method:
+                  type: string
+                  description: May be `manual` or `direct_deposit` if the employee has a linked bank account
+                earnings:
+                  type: array
+                  description: The set of earnings objects associated with the payroll item.
+                  items:
+                    properties:
+                      type:
+                        type: string
+                        description: Type of earning. Can be one of the following earning types in <a href="https://docs.checkhq.com/reference/types-of-earnings">Types of earnings</a>
+                      workplace:
+                        type: string
+                        description: ID of the workplace where work for this earning was performed
+                      earning_code:
+                        type: string
+                        description: The earning code id which will be used to aggregate earnings on the paystub
+                      description:
+                        type: string
+                        description: Readable description of the earning code that will show up on the paystub
+                      earning_rate:
+                        type: string
+                        description: The earning rate id which will be used to calculate the gross wage. Required if type is “piece”
+                      amount:
+                        type: string
+                        description: Amount earned for this earning<br><br>May be negative, for example to reverse or correct a previously reported earning
+                      hours:
+                        type: number
+                        description: Number of hours worked for this earning
+                        format: float
+                      piece_units:
+                        type: number
+                        description: Number of units of work produced. Required if type is “piece”
+                        format: float
+                      metadata:
+                        type: string
+                        description: Additional loosely structured information to associate with the earning
+                        format: json
+                    required:
+                    - workplace
+                    type: object
+                reimbursements:
+                  type: array
+                  description: The set of non-taxable reimbursements objects associated with the payroll item.
+                  items:
+                    properties:
+                      amount:
+                        type: string
+                        description: Amount of reimbursement<br><br>Must be greater than or equal to 0 on regular payrolls. Negative values are accepted on external payrolls
+                      description:
+                        type: string
+                        description: Description for the reimbursement that will show up on the paystub
+                      code:
+                        type: string
+                        description: Unique code to identify the reimbursement that will be used to aggregate reimbursements on the paystub. Recommended to always be included to have explicit groupings on the paystub.
+                      metadata:
+                        type: string
+                        description: Additional loosely structured information to associate with the reimbursement
+                        format: json
+                    required:
+                    - amount
+                    type: object
+                benefit_overrides:
+                  type: array
+                  description: The set of benefit override objects associated with this payroll item.
+                  items:
+                    properties:
+                      benefit:
+                        type: string
+                        description: ID of the employee benefit that is being overridden for the payroll item
+                      employee_contribution_amount:
+                        type: string
+                        description: Updated employee contribution amount to use for this payroll only
+                      company_contribution_amount:
+                        type: string
+                        description: Updated company contribution amount to use for this payroll only
+                    required:
+                    - benefit
+                    type: object
+                post_tax_deduction_overrides:
+                  type: array
+                  description: The set of post-tax deduction override objects associated with this payroll item.
+                  items:
+                    properties:
+                      post_tax_deduction:
+                        type: string
+                        description: ID of the miscellaneous post-tax deduction that is being overridden.
+                      amount:
+                        type: string
+                        description: Updated deduction amount to use for this payroll only
+                    required:
+                    - post_tax_deduction
+                    - amount
+                    type: object
+                tax_overrides:
+                  type: array
+                  description: The set of tax override objects associated with this payroll item.
+                  items:
+                    properties:
+                      tax:
+                        type: string
+                        description: ID of the tax being overridden. Only Federal Income Tax and State Income Taxes are eligible.
+                      amount:
+                        type: string
+                        description: Updated withholding amount to use for this payroll only.
+                    required:
+                    - tax
+                    - amount
+                    type: object
+                pto_balance_hours:
+                  type: number
+                  description: The employee's remaining PTO hour balance, for display on the paystub
+                  format: float
+                sick_balance_hours:
+                  type: number
+                  description: The employee's remaining sick hour balance, for display on the paystub
+                  format: float
+                state_covid_sick_balance_hours:
+                  type: number
+                  description: The employee's remaining sick hour balance from state COVID relief bills, for display on the paystub. This field is currently only applicable to California employers as per [SB-95](https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202120220SB95). When the requirement expires, this field will be removed in a future API version
+                  format: float
+                supplemental_tax_calc_method:
+                  type: string
+                  description: Controls the method used by Check to calculate tax on supplemental earnings. May be `flat` or `aggregate`
+                paper_check_number:
+                  type: string
+                  description: For accounting. The check number associated with any printed checks. Can be updated even after the associated payroll has been approved. See [Get a paper check](https://docs.checkhq.com/reference/get-a-paper-check) for more details.
+                paystub_info:
+                  type: string
+                  description: Loosely structured information that will be returned on paystubs generated for this payroll item. Limited to 15 keys, and 500 total characters (combined length of keys and values).
+                  format: json
+                metadata:
+                  type: string
+                  description: Additional loosely structured information to associate with the payroll item.
+                  format: json
+      responses:
+        '201':
+          description: '201'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: ''
+      deprecated: false
+      tags:
+      - Payroll Items
+    get:
+      summary: List payroll items
+      description: Return a list of payroll items.
+      operationId: list-payroll-items
+      parameters:
+      - name: payroll
+        in: query
+        description: Return payroll_items for this [payroll](https://docs.checkhq.com/reference/payroll) ID.
+        schema:
+          type: string
+      - name: employee
+        in: query
+        description: Return payroll_items for this employee ID
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of payroll items returned per page. The maximum value is 500.
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: id
+        in: query
+        description: Filter the list to the specified IDs. For more details, check out the [Bulk Get Requests guide](https://docs.checkhq.com/docs/bulk-resource-get-requests).
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"next\": \"https://sandbox.checkhq.com/payroll_items?cursor=cD0yMDIyLTAzLTIyKzE3JTNBMjklM0EyMC43NTI2MzIlMkIwMCUzQTAw\",\n    \"previous\": null,\n    \"results\": [\n        {\n            \"id\": \"itm_jMEjz0zwO0yGOusFaCnD\",\n            \"payroll\": \"pay_NTqYT28zV4YEIJVbA0wC\",\n            \"employee\": \"emp_veMl6MJVFFvTR4JRX5wa\",\n            \"status\": \"paid\",\n            \"void_of\": null,\n            \"voided_by\": null,\n            \"payment_method\": \"manual\",\n            \"supplemental_tax_calc_method\": \"aggregate\",\n            \"pto_balance_hours\": null,\n            \"sick_balance_hours\": null,\n            \"state_covid_sick_balance_hours\": null,\n            \"net_pay\": \"419.75\",\n            \"net_pay_split\": null,\n            \"earnings\": [\n                {\n                    \"amount\": \"400.00\",\n                    \"hours\": 20.0,\n                    \"type\": null,\n                    \"code\": null,\n                    \"description\": null,\n                    \"earning_code\": \"erc_tE4Sg1WMV59t7zaWNIj1\",\n                    \"earning_rate\": null,\n                    \"workplace\": \"wrk_5JNLdlXjcDJbRlwDDTOA\",\n                    \"metadata\": {}\n                },\n                {\n                    \"amount\": \"60.00\",\n                    \"hours\": 20.0,\n                    \"type\": null,\n                    \"code\": null,\n                    \"description\": null,\n                    \"earning_code\": \"erc_tJB4tLCYydrdPAH5PDQK\",\n                    \"earning_rate\": null,\n                    \"workplace\": \"wrk_5JNLdlXjcDJbRlwDDTOA\",\n                    \"metadata\": {}\n                }\n            ],\n            \"reimbursements\": [],\n            \"taxes\": [\n                {\n                    \"tax\": \"tax_ImvSF9CTuMdokf0uwx5x\",\n                    \"description\": \"Employer FICA Tax\",\n                    \"amount\": \"28.52\",\n                    \"payer\": \"company\",\n                    \"remittable\": true\n                },\n                {\n                    \"tax\": \"tax_u4DzMCYXAUL6OfcgPeyg\",\n                    \"description\": \"Federal Unemployment Tax\",\n                    \"amount\": \"2.76\",\n                    \"payer\": \"company\",\n                    \"remittable\": true\n                },\n            ],\n            \"benefits\": [],\n            \"benefit_overrides\": [],\n            \"post_tax_deductions\": [],\n          \t\"post_tax_deduction_overrides\": [],\n            \"tax_overrides\": [],\n            \"warnings\": [],\n            \"paper_check_number\": null,\n            \"metadata\": {}\n        },\n        {\n            \"id\": \"itm_HbroZTha5C5uLM3kNZcX\",\n            \"payroll\": \"pay_jWQfb9BgKa5ZudfgCC7R\",\n            \"employee\": \"emp_veMl6MJVFFvTR4JRX5wa\",\n            \"status\": \"paid\",\n            \"void_of\": null,\n            \"voided_by\": null,\n            \"payment_method\": \"manual\",\n            \"supplemental_tax_calc_method\": \"aggregate\",\n            \"pto_balance_hours\": null,\n            \"sick_balance_hours\": null,\n            \"state_covid_sick_balance_hours\": null,\n            \"net_pay\": \"1367.09\",\n            \"net_pay_split\": null,\n            \"earnings\": [\n                {\n                    \"amount\": \"1200.00\",\n                    \"hours\": 20.0,\n                    \"type\": null,\n                    \"code\": null,\n                    \"description\": null,\n                    \"earning_code\": \"erc_tJB4tLCYydrdPAH5PDQK\",\n                    \"earning_rate\": null,\n                    \"workplace\": \"wrk_5JNLdlXjcDJbRlwDDTOA\",\n                    \"metadata\": {}\n                },\n                {\n                    \"amount\": \"500.00\",\n                    \"hours\": 20.0,\n                    \"type\": null,\n                    \"code\": null,\n                    \"description\": null,\n                    \"earning_code\": \"erc_tE4Sg1WMV59t7zaWNIj1\",\n                    \"earning_rate\": null,\n                    \"workplace\": \"wrk_5JNLdlXjcDJbRlwDDTOA\",\n                    \"metadata\": {}\n                }\n            ],\n            \"reimbursements\": [],\n            \"taxes\": [\n                {\n                    \"tax\": \"tax_ImvSF9CTuMdokf0uwx5x\",\n                    \"description\": \"Employer FICA Tax\",\n                    \"amount\": \"105.40\",\n                    \"payer\": \"company\",\n                    \"remittable\": true\n                },\n                {\n                    \"tax\": \"tax_u4DzMCYXAUL6OfcgPeyg\",\n                    \"description\": \"Federal Unemployment Tax\",\n                    \"amount\": \"10.20\",\n                    \"payer\": \"company\",\n                    \"remittable\": true\n                },\n            ],\n            \"benefits\": [],\n            \"benefit_overrides\": [],\n            \"post_tax_deductions\": [],\n            \"post_tax_deduction_overrides\": [],\n            \"tax_overrides\": [],\n            \"warnings\": [],\n            \"paper_check_number\": null,\n            \"metadata\": {}\n        },\n      ]\n}"
+      deprecated: false
+      tags:
+      - Payroll Items
+    delete:
+      summary: Copy of Delete a payroll item
+      description: ''
+      operationId: delete_payroll_items{payroll_item}-1
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: 'Delete this payroll item. '
+      responses:
+        '204':
+          description: '204'
+          content:
+            text/plain:
+              examples:
+                Result:
+                  value: ''
+      deprecated: false
+      tags:
+      - Payroll Items
+  /payroll_items/{payroll_item}:
+    delete:
+      summary: Delete a payroll item
+      description: ''
+      operationId: delete-a-payroll-item
+      parameters:
+      - name: payroll_item
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '204':
+          description: '204'
+          content:
+            text/plain:
+              examples:
+                Result:
+                  value: ''
+      deprecated: false
+      tags:
+      - Payroll Items
+  /payroll_items/{payroll_item}/paper_check:
+    get:
+      summary: Get a paper check
+      description: 'Returns a paper check for the specified payroll item.
+
+
+        Use an `Accept: application/pdf` request header to download the paper check as a PDF document.'
+      operationId: get-a-paper-check
+      parameters:
+      - name: payroll_item
+        in: path
+        description: ID of the payroll item to return
+        schema:
+          type: string
+        required: true
+      - name: Accept
+        in: header
+        description: application/pdf
+        schema:
+          type: string
+      - name: payment_id
+        in: query
+        description: Optional ID of a single net-pay-split payment (`pyt_…`). When provided, the check amount is scoped to just that split's payment (e.g. to reissue one failed direct deposit) instead of the full net pay. Rejected unless that payment can be reissued (e.g. it already paid, is still in flight, or was reversed).
+        schema:
+          type: string
+      responses:
+        '202':
+          description: '202'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{"url": "string"}'
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: string
+        '400':
+          description: '400'
+          content:
+            text/plain:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Payroll Items
+components:
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

@@ -1,0 +1,446 @@
+openapi: 3.2.0
+info:
+  title: check-api Earning Rates API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Earning Rates
+paths:
+  /earning_rates:
+    post:
+      summary: Create an earning rate
+      description: ''
+      operationId: create-an-earning-rate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - amount
+              - period
+              - employee
+              properties:
+                amount:
+                  type: string
+                period:
+                  type: string
+                  description: May be `hourly`, `annually`, or `piece`
+                employee:
+                  type: string
+                name:
+                  type: string
+                workweek_hours:
+                  type: number
+                  description: Number of hours the employee works per week, most commonly for salaried employees
+                  default: 40
+                  format: float
+      responses:
+        '201':
+          description: '201'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"rte_aOSqW0QTKcE1iVU1C5\",\n    \"amount\": \"50000.00\",\n    \"period\": \"annually\",\n    \"employee\": \"emp_aslkj192j3laksdj\",\n    \"company\": \"com_omSihPyKgr68wxFQ0xTn\",\n    \"name\": \"Dishwasher Weekend Rate\",\n    \"workweek_hours\": 40.0,\n    \"active\": true,\n    \"metadata\": {}\n}"
+              schema:
+                $ref: '#/components/schemas/EarningRate'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Earning Rates
+    get:
+      summary: List earning rates
+      description: Returns a list of earning rates
+      operationId: list-earning-rates
+      parameters:
+      - name: active
+        in: query
+        schema:
+          type: boolean
+      - name: company
+        in: query
+        schema:
+          type: string
+      - name: employee
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of earning rates returned per page. The maximum value is 500.
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: id
+        in: query
+        description: Filter the list to the specified IDs. For more details, check out the [Bulk Get Requests guide](https://docs.checkhq.com/docs/bulk-resource-get-requests).
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"next\": null,\n    \"previous\": null,\n    \"results\": [\n        {\n            \"id\": \"rte_aOSqW0QTKcE1iVU1C5\",\n            \"amount\": \"50000.00\",\n            \"period\": \"annually\",\n            \"employee\": \"emp_aslkj192j3laksdj\",\n            \"company\": \"com_omSihPyKgr68wxFQ0xTn\",\n            \"name\": \"Dishwasher Weekend Rate\",\n            \"workweek_hours\": 40.0,\n            \"active\": true,\n            \"metadata\": {}\n        }\n    ]\n}"
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EarningRate'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Earning Rates
+  /earning_rates/{earning_rate}:
+    get:
+      summary: Get an earning rate
+      description: ''
+      operationId: get-an-earning-rate
+      parameters:
+      - name: earning_rate
+        in: path
+        description: ID for the earning rate object
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"rte_aOSqW0QTKcE1iVU1C5\",\n    \"amount\": \"50000.00\",\n    \"period\": \"annually\",\n    \"employee\": \"emp_aslkj192j3laksdj\",\n    \"company\": \"com_omSihPyKgr68wxFQ0xTn\",\n    \"name\": \"Dishwasher Weekend Rate\",\n    \"workweek_hours\": 40.0,\n    \"active\": true,\n    \"metadata\": {}\n}"
+              schema:
+                $ref: '#/components/schemas/EarningRate'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Earning Rates
+    patch:
+      summary: Update an earning rate
+      description: ''
+      operationId: update-an-earning-rate
+      parameters:
+      - name: earning_rate
+        in: path
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                active:
+                  type: boolean
+                metadata:
+                  type: string
+                  format: json
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"rte_aOSqW0QTKcE1iVU1C5\",\n    \"amount\": \"50000.00\",\n    \"period\": \"annually\",\n    \"employee\": \"emp_aslkj192j3laksdj\",\n    \"company\": \"com_omSihPyKgr68wxFQ0xTn\",\n    \"name\": \"Dishwasher Weekend Rate\",\n    \"workweek_hours\": 40.0,\n    \"active\": true,\n    \"metadata\": {}\n}"
+              schema:
+                $ref: '#/components/schemas/EarningRate'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Earning Rates
+components:
+  schemas:
+    EarningRate:
+      type: object
+      properties:
+        id:
+          type: string
+          example: rte_aOSqW0QTKcE1iVU1C5
+        amount:
+          type: string
+          example: '50000.00'
+        period:
+          type: string
+          description: May be `hourly`, `annually`, or `piece`
+          example: annually
+        employee:
+          type: string
+          example: emp_aslkj192j3laksdj
+        company:
+          type: string
+          description: ID of the company that this earning rate relates to (via the employee).
+          example: com_omSihPyKgr68wxFQ0xTn
+          readOnly: true
+        name:
+          type: string
+          example: Dishwasher Weekend Rate
+        workweek_hours:
+          type: number
+          format: float
+          example: 40
+        active:
+          type: boolean
+          example: true
+        metadata:
+          type: object
+          example: {}
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

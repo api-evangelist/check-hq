@@ -208,12 +208,16 @@ common:
 apis:
 - aid: check-hq:payroll-api
   name: Check Payroll API
-  description: The Check Payroll API is a comprehensive REST API for embedding end-to-end U.S. payroll inside another platform. It models companies,
-    workplaces, employees, contractors, pay schedules, paydays, payroll cycles, payroll items, earnings (regular, overtime, tipped, piece rate,
-    reimbursements), post-tax deductions and garnishments, benefits (pre-tax and post-tax), net pay splits, paystubs, paper checks, money movement,
-    tax parameters and elections, tax deposits, tax filings, employee tax statements (W-2 / W-2C / 1099), tax packages, fulfillments, setup and
-    embedded setup, integration partners, webhook configs, communications, and notifications. All resources are accessed under a versioned, bearer-authenticated
-    REST surface with idempotent writes, bulk operations, pagination, and sandbox simulation endpoints for funding and disbursement.
+  description: >-
+    The Check Payroll API is a comprehensive REST API for embedding end-to-end U.S. payroll inside another
+    platform. It models companies, workplaces, employees, contractors, pay schedules, paydays, payroll
+    cycles, payroll items, earnings (regular, overtime, tipped, piece rate, reimbursements), post-tax
+    deductions and garnishments, benefits (pre-tax and post-tax), net pay splits, paystubs, paper checks,
+    money movement, tax parameters and elections, tax deposits, tax filings, employee tax statements (W-2
+    / W-2C / 1099), tax packages, fulfillments, setup and embedded setup, integration partners, webhook
+    configs, communications, and notifications. All resources are accessed under a versioned, bearer-authenticated
+    REST surface with idempotent writes, bulk operations, pagination, and sandbox simulation endpoints
+    for funding and disbursement.
   humanURL: https://docs.checkhq.com
   baseURL: https://api.checkhq.com
   tags:
@@ -257,8 +261,9 @@ apis:
     url: https://docs.checkhq.com/llms.txt
   authentication:
   - type: Bearer
-    description: 'Bearer-token authentication via the `Authorization: Bearer <API_KEY>` header. API keys are scoped per environment (sandbox vs.
-      production) and per partner integration.'
+    description: >-
+      Bearer-token authentication via the `Authorization: Bearer <API_KEY>` header. API keys are scoped
+      per environment (sandbox vs. production) and per partner integration.
   rateLimits:
   - type: PerSecond
     value: 25
@@ -267,8 +272,9 @@ apis:
     value: 100
     description: 100 concurrent in-flight requests per partner (not configurable).
   - type: BackoffHeader
-    description: 429 responses include a Retry-After header; RateLimit-Limit and RateLimit-Remaining headers are returned on every authenticated
-      response (IETF RateLimit Headers).
+    description: >-
+      429 responses include a Retry-After header; RateLimit-Limit and RateLimit-Remaining headers are
+      returned on every authenticated response (IETF RateLimit Headers).
   features:
   - name: Embedded Payroll
     description: Run full-service U.S. payroll for end customers from inside your own product.
@@ -285,7 +291,8 @@ apis:
   - name: Off-Cycle Payrolls
     description: Schedule one-off payments with configurable benefit and deduction behavior.
   - name: Earnings Structures
-    description: Custom earning codes and rates, including tipped, piece rate, overtime, and reimbursements.
+    description: >-
+      Custom earning codes and rates, including tipped, piece rate, overtime, and reimbursements.
   - name: Post-Tax Deductions and Garnishments
     description: Configure after-tax deductions including child support and other garnishments.
   - name: Benefits
@@ -297,9 +304,11 @@ apis:
   - name: Money Movement
     description: ACH disbursement, fund-by-wire, payment retries, refunds, NOCs, and failure recovery.
   - name: Tax Calculation
-    description: Federal, state, and local tax calculation including multi-state withholdings and reciprocity.
+    description: >-
+      Federal, state, and local tax calculation including multi-state withholdings and reciprocity.
   - name: Tax Filings and Deposits
-    description: Quarterly and annual filings, agency tax deposits, fulfillments, and authorization documents.
+    description: >-
+      Quarterly and annual filings, agency tax deposits, fulfillments, and authorization documents.
   - name: Employee Tax Statements
     description: Asynchronous W-2, W-2C, and tax package generation, downloadable as PDF.
   - name: Paystubs and Paper Checks
@@ -307,14 +316,17 @@ apis:
   - name: Webhooks
     description: Resource-scoped event delivery with signature verification and topic-based routing.
   - name: Embedded Setup
-    description: Delegate full company setup, EIN, tax registration, and prior-payroll migration to Check operators.
+    description: >-
+      Delegate full company setup, EIN, tax registration, and prior-payroll migration to Check operators.
   - name: Sensitive Data API
     description: Dedicated surface for reveal-style operations on SSNs and bank account numbers.
   - name: Sandbox Simulation
-    description: Sandbox-only endpoints to complete funding, complete disbursements, or fail funding for tests.
+    description: >-
+      Sandbox-only endpoints to complete funding, complete disbursements, or fail funding for tests.
   useCases:
   - name: Vertical SaaS Payroll
-    description: Add native payroll to vertical SaaS platforms in trades, hospitality, fitness, and salons.
+    description: >-
+      Add native payroll to vertical SaaS platforms in trades, hospitality, fitness, and salons.
   - name: Workforce Management Payroll
     description: Tightly couple time-tracking and scheduling data with end-to-end payroll runs.
   - name: HR and PEO Platforms
@@ -346,10 +358,12 @@ apis:
     description: First-party Postman environment templates for sandbox testing.
 - aid: check-hq:components
   name: Check Components
-  description: Check Components is a library of white-labeled, drop-in React UI elements that handle the highest-friction surfaces of embedded
-    payroll — company onboarding, terms of service, bank linking, employee tax setup, withholdings (W-4), filing authorization, verification documents,
-    and Run Payroll — including the Check Onboard flow. Components are embedded via short-lived component links generated through the API and
-    emit DOM events for lifecycle states.
+  description: >-
+    Check Components is a library of white-labeled, drop-in React UI elements that handle the highest-friction
+    surfaces of embedded payroll — company onboarding, terms of service, bank linking, employee tax setup,
+    withholdings (W-4), filing authorization, verification documents, and Run Payroll — including the
+    Check Onboard flow. Components are embedded via short-lived component links generated through the
+    API and emit DOM events for lifecycle states.
   humanURL: https://docs.checkhq.com/docs/check-components
   tags:
   - React
@@ -395,10 +409,12 @@ apis:
     description: Components emit lifecycle events such as completion and already-complete states.
 - aid: check-hq:mcp-server
   name: Check MCP Server
-  description: The Check MCP Server exposes the Check Payroll API to AI tools and agents via the Model Context Protocol. It is offered as both
-    a hosted (remote) endpoint requiring no infrastructure and a self-hosted package for full control of the runtime environment. The server maps
-    Check API operations to MCP tools, allowing natural-language access to companies, employees, payrolls, tax filings, payments, and reports
-    for AI-assisted operator workflows.
+  description: >-
+    The Check MCP Server exposes the Check Payroll API to AI tools and agents via the Model Context Protocol.
+    It is offered as both a hosted (remote) endpoint requiring no infrastructure and a self-hosted package
+    for full control of the runtime environment. The server maps Check API operations to MCP tools, allowing
+    natural-language access to companies, employees, payrolls, tax filings, payments, and reports for
+    AI-assisted operator workflows.
   humanURL: https://docs.checkhq.com/docs/overview-1
   tags:
   - MCP
@@ -425,9 +441,11 @@ apis:
     description: Query and operate payroll resources using LLM-driven tool calls.
 - aid: check-hq:cli
   name: Check CLI
-  description: The Check Command-Line Interface is a Python-based CLI installed via the uv package manager that exposes 270 functions across 18
-    resource groups of the Check Payroll API. It is designed for shell scripts, CI/CD pipelines, and ad-hoc data lookups, returning JSON output
-    that composes cleanly with Unix tools such as jq.
+  description: >-
+    The Check Command-Line Interface is a Python-based CLI installed via the uv package manager that exposes
+    270 functions across 18 resource groups of the Check Payroll API. It is designed for shell scripts,
+    CI/CD pipelines, and ad-hoc data lookups, returning JSON output that composes cleanly with Unix tools
+    such as jq.
   humanURL: https://docs.checkhq.com/docs/check-command-line-interface-cli
   tags:
   - CLI
@@ -446,21 +464,581 @@ apis:
     description: Machine-readable JSON output suitable for jq and shell pipelines.
   - name: CI/CD Friendly
     description: Designed for automation in scripts and continuous-delivery pipelines.
-- aid: check-hq:check-hq-api
-  name: Check Hq API
-  description: The Hq API from Check — 159 operation(s) for hq.
+- aid: check-hq:check-hq-addresses-api
+  name: Check Addresses API
+  description: The Addresses API from Check — 1 operation(s) for addresses.
   humanURL: https://docs.checkhq.com
   baseURL: https://api.checkhq.com
   tags:
-  - Hq
+  - Addresses
   properties:
   - type: OpenAPI
-    url: openapi/check-hq-api-openapi.yml
+    url: openapi/check-hq-addresses-api-openapi.yml
   - type: JSONSchema
     url: json-schema/check-hq-log-schema.json
   - type: JSONSchema
     url: json-schema/check-hq-earning-rate-schema.json
-
+- aid: check-hq:check-hq-agencies-api
+  name: Check Agencies API
+  description: The Agencies API from Check — 2 operation(s) for agencies.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Agencies
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-agencies-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-bank-accounts-api
+  name: Check Bank Accounts API
+  description: The Bank Accounts API from Check — 3 operation(s) for bank accounts.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Bank Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-bank-accounts-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-benefits-api
+  name: Check Benefits API
+  description: The Benefits API from Check — 2 operation(s) for benefits.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Benefits
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-benefits-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-communications-api
+  name: Check Communications API
+  description: The Communications API from Check — 2 operation(s) for communications.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Communications
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-communications-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-companies-api
+  name: Check Companies API
+  description: The Companies API from Check — 31 operation(s) for companies.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Companies
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-companies-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-company-benefits-api
+  name: Check Company Benefits API
+  description: The Company Benefits API from Check — 2 operation(s) for company benefits.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Company Benefits
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-company-benefits-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-company-provided-documents-api
+  name: Check Company Provided Documents API
+  description: >-
+    The Company Provided Documents API from Check — 1 operation(s) for company provided documents.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Company Provided Documents
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-company-provided-documents-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-company-tax-elections-api
+  name: Check Company Tax Elections API
+  description: The Company Tax Elections API from Check — 1 operation(s) for company tax elections.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Company Tax Elections
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-company-tax-elections-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-company-tax-params-api
+  name: Check Company Tax Params API
+  description: The Company Tax Params API from Check — 2 operation(s) for company tax params.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Company Tax Params
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-company-tax-params-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-contractor-payments-api
+  name: Check Contractor Payments API
+  description: The Contractor Payments API from Check — 3 operation(s) for contractor payments.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Contractor Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-contractor-payments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-contractors-api
+  name: Check Contractors API
+  description: The Contractors API from Check — 7 operation(s) for contractors.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Contractors
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-contractors-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-corrections-api
+  name: Check Corrections API
+  description: The Corrections API from Check — 10 operation(s) for corrections.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Corrections
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-corrections-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-documents-api
+  name: Check Documents API
+  description: The Documents API from Check — 7 operation(s) for documents.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Documents
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-documents-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-earning-codes-api
+  name: Check Earning Codes API
+  description: The Earning Codes API from Check — 2 operation(s) for earning codes.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Earning Codes
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-earning-codes-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-earning-rates-api
+  name: Check Earning Rates API
+  description: The Earning Rates API from Check — 2 operation(s) for earning rates.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Earning Rates
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-earning-rates-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-employee-tax-elections-api
+  name: Check Employee Tax Elections API
+  description: The Employee Tax Elections API from Check — 1 operation(s) for employee tax elections.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Employee Tax Elections
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-employee-tax-elections-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-employee-tax-params-api
+  name: Check Employee Tax Params API
+  description: The Employee Tax Params API from Check — 4 operation(s) for employee tax params.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Employee Tax Params
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-employee-tax-params-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-employee-tax-statements-api
+  name: Check Employee Tax Statements API
+  description: The Employee Tax Statements API from Check — 2 operation(s) for employee tax statements.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Employee Tax Statements
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-employee-tax-statements-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-employees-api
+  name: Check Employees API
+  description: The Employees API from Check — 5 operation(s) for employees.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Employees
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-employees-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-external-payrolls-api
+  name: Check External Payrolls API
+  description: The External Payrolls API from Check — 6 operation(s) for external payrolls.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - External Payrolls
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-external-payrolls-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-filings-api
+  name: Check Filings API
+  description: The Filings API from Check — 4 operation(s) for filings.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Filings
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-filings-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-forms-api
+  name: Check Forms API
+  description: The Forms API from Check — 2 operation(s) for forms.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Forms
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-forms-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-fulfillments-api
+  name: Check Fulfillments API
+  description: The Fulfillments API from Check — 3 operation(s) for fulfillments.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Fulfillments
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-fulfillments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-integrations-api
+  name: Check Integrations API
+  description: The Integrations API from Check — 6 operation(s) for integrations.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Integrations
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-integrations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-logs-api
+  name: Check Logs API
+  description: The Logs API from Check — 2 operation(s) for logs.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Logs
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-logs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-net-pay-splits-api
+  name: Check Net Pay Splits API
+  description: The Net Pay Splits API from Check — 1 operation(s) for net pay splits.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Net Pay Splits
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-net-pay-splits-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-notifications-api
+  name: Check Notifications API
+  description: The Notifications API from Check — 2 operation(s) for notifications.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Notifications
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-notifications-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-pay-schedules-api
+  name: Check Pay Schedules API
+  description: The Pay Schedules API from Check — 3 operation(s) for pay schedules.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Pay Schedules
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-pay-schedules-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-payments-api
+  name: Check Payments API
+  description: The Payments API from Check — 4 operation(s) for payments.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-payments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-payroll-items-api
+  name: Check Payroll Items API
+  description: The Payroll Items API from Check — 3 operation(s) for payroll items.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Payroll Items
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-payroll-items-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-payrolls-api
+  name: Check Payrolls API
+  description: The Payrolls API from Check — 12 operation(s) for payrolls.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Payrolls
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-payrolls-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-post-tax-deductions-api
+  name: Check Post Tax Deductions API
+  description: The Post Tax Deductions API from Check — 2 operation(s) for post tax deductions.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Post Tax Deductions
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-post-tax-deductions-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-report-runs-api
+  name: Check Report Runs API
+  description: The Report Runs API from Check — 3 operation(s) for report runs.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Report Runs
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-report-runs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-setups-api
+  name: Check Setups API
+  description: The Setups API from Check — 2 operation(s) for setups.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Setups
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-setups-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-tax-packages-api
+  name: Check Tax Packages API
+  description: The Tax Packages API from Check — 3 operation(s) for tax packages.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Tax Packages
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-tax-packages-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-taxes-api
+  name: Check Taxes API
+  description: The Taxes API from Check — 2 operation(s) for taxes.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Taxes
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-taxes-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-usage-api
+  name: Check Usage API
+  description: The Usage API from Check — 2 operation(s) for usage.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Usage
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-usage-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-webhook-configs-api
+  name: Check Webhook Configs API
+  description: The Webhook Configs API from Check — 2 operation(s) for webhook configs.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Webhook Configs
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-webhook-configs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-webhook-deliveries-api
+  name: Check Webhook Deliveries API
+  description: The Webhook Deliveries API from Check — 3 operation(s) for webhook deliveries.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Webhook Deliveries
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-webhook-deliveries-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
+- aid: check-hq:check-hq-workplaces-api
+  name: Check Workplaces API
+  description: The Workplaces API from Check — 2 operation(s) for workplaces.
+  humanURL: https://docs.checkhq.com
+  baseURL: https://api.checkhq.com
+  tags:
+  - Workplaces
+  properties:
+  - type: OpenAPI
+    url: openapi/check-hq-workplaces-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/check-hq-log-schema.json
+  - type: JSONSchema
+    url: json-schema/check-hq-earning-rate-schema.json
 x-readme-harvest:
   date: '2026-10-14'
   ops: 188

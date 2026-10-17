@@ -1,0 +1,504 @@
+openapi: 3.2.0
+info:
+  title: check-api Taxes API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Taxes
+paths:
+  /taxes:
+    get:
+      summary: List taxes
+      operationId: list-taxes
+      description: 'Returns the catalog of payroll taxes Check tracks — both taxes Check supports and in-domain taxes it does not support (see the Tax object).
+
+
+        By default the list includes only taxes whose obligation is currently in effect; pass `effective=false` to list repealed or lapsed taxes instead.
+
+
+        Results are ordered with federal taxes first, then by `jurisdiction`, then by `label`. Pages contain 25 results by default and at most 500 (`limit`).'
+      parameters:
+      - name: id
+        in: query
+        description: Tax IDs to look up, for batch lookups. Repeat the parameter to provide multiple values (max 500 per request).
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: jurisdiction
+        in: query
+        description: Jurisdictions to filter to, as lowercase region codes (e.g. `fed`, `ny`, `pa`). A state's code includes its state and local taxes. Repeat the parameter to provide multiple values.
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: supported
+        in: query
+        description: Filter by whether Check calculates and reports (files) the tax. Use `supported=false` to find in-domain taxes Check does not support.
+        schema:
+          type: boolean
+      - name: remittable
+        in: query
+        description: Filter by whether Check remits the tax to the agency on your behalf. Because remittance implies support, `remittable=true` returns a subset of `supported=true`.
+        schema:
+          type: boolean
+      - name: effective
+        in: query
+        description: Filter by whether the tax obligation is in effect as of today. When omitted, the list includes only currently effective taxes.
+        schema:
+          type: boolean
+      - name: label_contains
+        in: query
+        description: Case-insensitive substring match on the tax `label`. Useful for looking up local taxes by name.
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of results per page (default 25, max 500).
+        schema:
+          type: integer
+          default: 25
+          maximum: 500
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value:
+                    next: https://sandbox.checkhq.com/taxes?cursor=cD0lNUIlMjJmZWQlMjIlMkMlMjJGZWRlcmFsK1VuZW1wbG95bWVudCtUYXglMjIlNUQ
+                    previous: null
+                    results:
+                    - id: tax_8L3JLfsH4X6dp0maBWfW
+                      label: Federal Income Tax
+                      jurisdiction: fed
+                      payer: employee
+                      supported: true
+                      remittable: true
+                      effective_from: '1900-01-01'
+                      effective_to: null
+                    - id: tax_u4DzMCYXAUL6OfcgPeyg
+                      label: Federal Unemployment Tax
+                      jurisdiction: fed
+                      payer: company
+                      supported: true
+                      remittable: true
+                      effective_from: '1900-01-01'
+                      effective_to: null
+                    - id: tax_xs7qYWN4Y3je34zlrimK
+                      label: Hatboro Borough / Horsham SD Local Services Tax
+                      jurisdiction: pa
+                      payer: employee
+                      supported: true
+                      remittable: true
+                      effective_from: '2021-01-01'
+                      effective_to: null
+              schema:
+                type: object
+                properties:
+                  next:
+                    type: string
+                    nullable: true
+                    description: URL of the next page of results, or null if there are no more.
+                  previous:
+                    type: string
+                    nullable: true
+                    description: URL of the previous page of results, or null on the first page.
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique identifier (`tax_` prefix).
+                          example: tax_8L3JLfsH4X6dp0maBWfW
+                        label:
+                          type: string
+                          description: Human-readable name for display.
+                          example: Federal Income Tax
+                        jurisdiction:
+                          type: string
+                          description: Lowercase region code (`fed` or a lowercased ISO 3166-2:US region code). Local taxes use their state's value.
+                          example: fed
+                        payer:
+                          type: string
+                          enum:
+                          - employee
+                          - company
+                          description: 'Whose money pays the tax: `employee` (withheld) or `company` (employer cost).'
+                          example: employee
+                        supported:
+                          type: boolean
+                          nullable: true
+                          description: Whether Check calculates and reports (files) this tax. Does not imply Check remits it — see `remittable`.
+                          example: true
+                        remittable:
+                          type: boolean
+                          description: Whether Check remits this tax to the agency on your behalf. Always `false` when `supported` is `false` (Check can’t remit a tax it doesn’t support); may also be `false` for supported taxes the employer self-remits (e.g. NY SDI paid to a private carrier).
+                          example: true
+                        effective_from:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: First date (inclusive) the obligation exists. Very old taxes carry values of `1900-01-01`.
+                          example: '1900-01-01'
+                        effective_to:
+                          type: string
+                          format: date
+                          nullable: true
+                          description: Last date (inclusive) the obligation applies; `null` while still in effect.
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value:
+                    error:
+                      type: validation_error
+                      message: Please correct the required fields and try again.
+                      input_errors:
+                      - field: detail
+                        field_path:
+                        - detail
+                        message: Unknown jurisdiction.
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: validation_error
+                      message:
+                        type: string
+                        example: Please correct the required fields and try again.
+                      input_errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            field:
+                              type: string
+                              example: detail
+                            field_path:
+                              type: array
+                              items:
+                                type: string
+                            message:
+                              type: string
+                              example: Unknown jurisdiction.
+      deprecated: false
+      tags:
+      - Taxes
+  /taxes/{id}:
+    get:
+      summary: Get a tax
+      operationId: get-a-tax
+      description: Returns a single payroll tax by ID.
+      parameters:
+      - name: id
+        in: path
+        description: ID of the tax.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value:
+                    id: tax_8L3JLfsH4X6dp0maBWfW
+                    label: Federal Income Tax
+                    jurisdiction: fed
+                    payer: employee
+                    supported: true
+                    remittable: true
+                    effective_from: '1900-01-01'
+                    effective_to: null
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique identifier (`tax_` prefix).
+                    example: tax_8L3JLfsH4X6dp0maBWfW
+                  label:
+                    type: string
+                    description: Human-readable name for display.
+                    example: Federal Income Tax
+                  jurisdiction:
+                    type: string
+                    description: Lowercase region code (`fed` or a lowercased ISO 3166-2:US region code). Local taxes use their state's value.
+                    example: fed
+                  payer:
+                    type: string
+                    enum:
+                    - employee
+                    - company
+                    description: 'Whose money pays the tax: `employee` (withheld) or `company` (employer cost).'
+                    example: employee
+                  supported:
+                    type: boolean
+                    nullable: true
+                    description: Whether Check calculates and reports (files) this tax. Does not imply Check remits it — see `remittable`.
+                    example: true
+                  remittable:
+                    type: boolean
+                    description: Whether Check remits this tax to the agency on your behalf. Always `false` when `supported` is `false` (Check can’t remit a tax it doesn’t support); may also be `false` for supported taxes the employer self-remits (e.g. NY SDI paid to a private carrier).
+                    example: true
+                  effective_from:
+                    type: string
+                    format: date
+                    nullable: true
+                    description: First date (inclusive) the obligation exists. Very old taxes carry values of `1900-01-01`.
+                    example: '1900-01-01'
+                  effective_to:
+                    type: string
+                    format: date
+                    nullable: true
+                    description: Last date (inclusive) the obligation applies; `null` while still in effect.
+        '404':
+          description: '404'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value:
+                    error:
+                      type: not_found
+                      message: Not found.
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: not_found
+                      message:
+                        type: string
+                        example: Not found.
+      deprecated: false
+      tags:
+      - Taxes
+components:
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

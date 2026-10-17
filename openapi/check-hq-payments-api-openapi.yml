@@ -1,0 +1,674 @@
+openapi: 3.2.0
+info:
+  title: check-api Payments API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Payments
+paths:
+  /payments:
+    get:
+      summary: List payments
+      description: ''
+      operationId: list-payments
+      parameters:
+      - name: payroll
+        in: query
+        description: Return all payments, including debits and credits, related to a particular payroll ID
+        schema:
+          type: string
+      - name: payroll_item
+        in: query
+        description: Return payments related to a particular parent payroll_item ID
+        schema:
+          type: string
+      - name: contractor_payment
+        in: query
+        description: Return payments related to a particular parent contractor payment ID
+        schema:
+          type: string
+      - name: parent_id
+        in: query
+        description: Return payments whose `parent_id` matches the given value. Repeat the parameter to match any of multiple parent IDs (OR), for example `?parent_id=pay_abc&parent_id=cor_def`. Values are matched against the `parent_id` returned on payment responses, including correction IDs (`cor_...`) when a correction is the parent. At most 100 values are allowed per request.
+        schema:
+          type: string
+      - name: company
+        in: query
+        description: Return payments related to a particular company ID
+        schema:
+          type: string
+      - name: direction
+        in: query
+        description: Return payments with direction
+        schema:
+          type: string
+          enum:
+          - credit
+          - debit
+      - name: amount_min
+        in: query
+        description: Return payments where amount ≥ an amount
+        schema:
+          type: string
+      - name: amount_max
+        in: query
+        description: Return payments where amount ≤ an amount
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: Return payments with type
+        schema:
+          type: string
+          enum:
+          - company_cash_requirement
+          - employee_net_pay
+          - net_pay_refund
+          - collection
+          - refund
+      - name: completion_date_after
+        in: query
+        description: Return payments whose expected completion date is on or after the specified date
+        schema:
+          type: string
+          format: date
+      - name: completion_date_before
+        in: query
+        description: Return payments whose expected completion date is on or before the specified date
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        description: Number of payments returned per page. The maximum value is 100.
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: query
+        description: Filter the list to the specified IDs. For more details, check out the [Bulk Get Requests guide](https://docs.checkhq.com/docs/bulk-resource-get-requests).
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": \"pyt_uzasLBvddSm6aJkHGwQw\",\n      \"status\": \"paid\",\n      \"amount\": \"4522.0400\",\n      \"type\": \"company_cash_requirement\",\n      \"parent_type\": \"payroll\",\n      \"parent_id\": \"pay_aPKCtxqbi1jDNEWRrz9w\",\n      \"payment_attempts\": [\n        {\n          \"id\": \"pya_LUHvXtQBhkNM22xIk8K1\",\n          \"created_at\": \"2022-02-18T20:17:13.033205Z\",\n          \"expected_completion_date\": \"2022-02-23\",\n          \"status\": \"paid\",\n          \"failure_code\": null,\n          \"payment_method\": \"ach\",\n          \"payment_instrument\": \"bnk_W7hjDGn6sU1d3U8dr9bq\",\n          \"wire_details\": null,\n          \"ach_details\": {\n\t          \"ach_trace_id\": \"ABC12300080\",\n            \"description\": \"PAYMENT\",\n            \"transaction_type_code\": \"PCR\"\n          }\n        }\n      ],\n      \"can_retry\": false,\n      \"can_refund\": false,\n      \"can_cancel\": false,\n  \t\t\"cancel_deadline\": \"2022-02-19T17:00:00.000Z\",\n      \"direction\": \"debit\",\n      \"company\": \"com_ENA4k8LMHbgpV07GLGSv\"\n    }\n  ]\n}"
+              schema:
+                type: object
+                properties:
+                  next: {}
+                  previous: {}
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: pyt_uzasLBvddSm6aJkHGwQw
+                        status:
+                          type: string
+                          example: paid
+                        amount:
+                          type: string
+                          example: '4522.0400'
+                        type:
+                          type: string
+                          example: company_cash_requirement
+                        parent_type:
+                          type: string
+                          description: The parent type of the payment. One of `payroll`, `payroll_item`, `contractor_payment`, `collection`, `refund`, or `correction`. Payments that fund a correction report `correction` as the parent type.
+                          example: payroll
+                        parent_id:
+                          type: string
+                          description: The id of the parent of the payment (see `parent_type`). An id can be a `pay_...`, `itm_...`, `cpa_...`, `pyt_...`, or `cor_...` id. When `parent_type` is `correction`, this is the correction's id.
+                          example: pay_aPKCtxqbi1jDNEWRrz9w
+                        payment_attempts:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: pya_LUHvXtQBhkNM22xIk8K1
+                              created_at:
+                                type: string
+                                example: '2022-02-18T20:17:13.033205Z'
+                              expected_completion_date:
+                                type: string
+                                example: '2022-02-23'
+                              status:
+                                type: string
+                                example: paid
+                              failure_code: {}
+                              payment_method:
+                                type: string
+                                example: ach
+                              payment_instrument:
+                                type: string
+                                example: bnk_W7hjDGn6sU1d3U8dr9bq
+                              wire_details: {}
+                              ach_details:
+                                type: object
+                                properties:
+                                  ach_trace_id:
+                                    type: string
+                                    example: ABC12300080
+                                  description:
+                                    type: string
+                                    example: PAYMENT
+                                  transaction_type_code:
+                                    type: string
+                                    example: PCR
+                        can_retry:
+                          type: boolean
+                          example: false
+                          default: true
+                        can_refund:
+                          type: boolean
+                          example: false
+                          default: true
+                        can_cancel:
+                          type: boolean
+                          example: false
+                          default: true
+                        cancel_deadline:
+                          type: string
+                          example: '2022-02-19T17:00:00.000Z'
+                        direction:
+                          type: string
+                          example: debit
+                        company:
+                          type: string
+                          example: com_ENA4k8LMHbgpV07GLGSv
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Payments
+  /payments/{payment}/cancel:
+    post:
+      summary: Cancel a payment
+      description: ''
+      operationId: cancel-a-payment
+      parameters:
+      - name: payment
+        in: path
+        schema:
+          type: string
+          default: ID of payment desired for cancellation
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"pyt_vIFHhvyGN47ej1upyIT8\",\n    \"status\": \"failed\",\n    \"amount\": \"4522.0400\",\n    \"type\": \"employee_net_pay\",\n    \"parent_type\": \"payroll_item\",\n    \"parent_id\": \"itm_ENA4k8LMHbgpV07GLGSv\",\n    \"payment_attempts\": [\n        {\n            \"id\": \"pya_Kgl6ERboridVSfv4XKdT\",\n            \"created_at\": \"2022-02-18T20:14:40.713837Z\",\n            \"expected_completion_date\": \"2022-02-23\",\n            \"status\": \"canceled\",\n            \"failure_code\": null,\n            \"payment_method\": \"ach\",\n            \"payment_instrument\": \"bnk_W7hjDGn6sU1d3U8dr9bq\",\n            \"wire_details\": null\n        }\n    ],\n    \"can_retry\": false,\n    \"can_refund\": false,\n    \"can_cancel\": false,\n    \"cancel_deadline\": \"2022-02-19T17:00:00.000Z\",\n    \"direction\": \"credit\",\n    \"company\": \"com_ENA4k8LMHbgpV07GLGSv\"\n}"
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: pyt_vIFHhvyGN47ej1upyIT8
+                  status:
+                    type: string
+                    example: failed
+                  amount:
+                    type: string
+                    example: '4522.0400'
+                  type:
+                    type: string
+                    example: employee_net_pay
+                  parent_type:
+                    type: string
+                    description: The parent type of the payment. One of `payroll`, `payroll_item`, `contractor_payment`, `collection`, `refund`, or `correction`. Payments that fund a correction report `correction` as the parent type.
+                    example: payroll_item
+                  parent_id:
+                    type: string
+                    description: The id of the parent of the payment (see `parent_type`). An id can be a `pay_...`, `itm_...`, `cpa_...`, `pyt_...`, or `cor_...` id. When `parent_type` is `correction`, this is the correction's id.
+                    example: itm_ENA4k8LMHbgpV07GLGSv
+                  payment_attempts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: pya_Kgl6ERboridVSfv4XKdT
+                        created_at:
+                          type: string
+                          example: '2022-02-18T20:14:40.713837Z'
+                        expected_completion_date:
+                          type: string
+                          example: '2022-02-23'
+                        status:
+                          type: string
+                          example: canceled
+                        failure_code: {}
+                        payment_method:
+                          type: string
+                          example: ach
+                        payment_instrument:
+                          type: string
+                          example: bnk_W7hjDGn6sU1d3U8dr9bq
+                        wire_details: {}
+                  can_retry:
+                    type: boolean
+                    example: false
+                    default: true
+                  can_refund:
+                    type: boolean
+                    example: false
+                    default: true
+                  can_cancel:
+                    type: boolean
+                    example: false
+                    default: true
+                  cancel_deadline:
+                    type: string
+                    example: '2022-02-19T17:00:00.000Z'
+                  direction:
+                    type: string
+                    example: credit
+                  company:
+                    type: string
+                    example: com_ENA4k8LMHbgpV07GLGSv
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Payments
+  /payments/{payment}/refund:
+    post:
+      summary: Refund a payment
+      description: ''
+      operationId: refund-a-payment
+      parameters:
+      - name: payment
+        in: path
+        description: ID of payment desired for refund
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"pyt_vIFHhvyGN47ej1upyIT8\",\n    \"status\": \"refunded\",\n    \"amount\": \"4522.0400\",\n    \"type\": \"employee_net_pay\",\n    \"parent_type\": \"payroll_item\",\n    \"parent_id\": \"itm_ENA4k8LMHbgpV07GLGSv\",\n    \"payment_attempts\": [\n        {\n            \"id\": \"pya_GaeJoEAzbqqc2D9GMfOF\",\n            \"created_at\": \"2022-02-18T21:32:44.957364Z\",\n            \"expected_completion_date\": \"2022-02-25\",\n            \"status\": \"refunded\",\n            \"failure_code\": null,\n            \"payment_method\": \"manual\",\n            \"payment_instrument\": null,\n            \"wire_details\": null\n        },\n        {\n            \"id\": \"pya_Kgl6ERboridVSfv4XKdT\",\n            \"created_at\": \"2022-02-18T20:14:40.713837Z\",\n            \"expected_completion_date\": \"2022-02-23\",\n            \"status\": \"failed\",\n            \"failure_code\": \"account_closed\",\n            \"payment_method\": \"ach\",\n            \"payment_instrument\": \"bnk_W7hjDGn6sU1d3U8dr9bq\",\n            \"wire_details\": null\n        }\n    ],\n    \"can_retry\": false,\n    \"can_refund\": false,\n    \"can_cancel\": false,\n    \"cancel_deadline\": \"2022-02-19T17:00:00.000Z\",\n    \"direction\": \"credit\",\n    \"company\": \"com_ENA4k8LMHbgpV07GLGSv\"\n}"
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Payments
+  /payments/{payment}/retry:
+    post:
+      summary: Retry a payment
+      description: ''
+      operationId: retry-a-payment
+      parameters:
+      - name: payment
+        in: path
+        description: ID of the payment desired for retry.
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                use_wire:
+                  type: boolean
+                  description: Boolean parameter indicating whether a wire retry is desired
+                  default: false
+                bank_account:
+                  type: string
+                  description: Parameter to accept a new bank account to use to retry this payment.
+                payment_type:
+                  type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"pyt_vIFHhvyGN47ej1upyIT8\",\n    \"status\": \"failed\",\n    \"amount\": \"4522.0400\",\n    \"type\": \"company_cash_requirement\",\n    \"parent_type\": \"payroll\",\n    \"parent_id\": \"pay_ENA4k8LMHbgpV07GLGSv\",\n    \"payment_attempts\": [\n        {\n            \"id\": \"pya_GaeJoEAzbqqc2D9GMfOF\",\n            \"created_at\": \"2022-02-18T21:32:44.957364Z\",\n            \"expected_completion_date\": \"2022-02-25\",\n            \"status\": \"failed\",\n            \"failure_code\": null,\n            \"payment_method\": \"wire\",\n            \"payment_instrument\": null,\n            \"wire_details\": {\n                \"account_number\": \"3302826020\",\n                \"routing_number\": \"121140399\",\n                \"bank_name\": \"Silicon Valley Bank\",\n                \"account_name\": \"SVB for benefit of CHECK TECHNOLOGIES\",\n                \"account_address\": \"3003 Tasman Drive, Santa Clara, CA 95054\",\n                \"amount\": 4522.04\n            }\n        },\n        {\n            \"id\": \"pya_Kgl6ERboridVSfv4XKdT\",\n            \"created_at\": \"2022-02-18T20:14:40.713837Z\",\n            \"expected_completion_date\": \"2022-02-23\",\n            \"status\": \"failed\",\n            \"failure_code\": null,\n            \"payment_method\": \"ach\",\n            \"payment_instrument\": \"bnk_W7hjDGn6sU1d3U8dr9bq\",\n            \"wire_details\": null\n        }\n    ],\n    \"can_retry\": false,\n    \"can_refund\": false,\n    \"direction\": \"debit\"\n}"
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: pyt_vIFHhvyGN47ej1upyIT8
+                  status:
+                    type: string
+                    example: failed
+                  amount:
+                    type: string
+                    example: '4522.0400'
+                  type:
+                    type: string
+                    example: company_cash_requirement
+                  parent_type:
+                    type: string
+                    description: The parent type of the payment. One of `payroll`, `payroll_item`, `contractor_payment`, `collection`, `refund`, or `correction`. Payments that fund a correction report `correction` as the parent type.
+                    example: payroll
+                  parent_id:
+                    type: string
+                    description: The id of the parent of the payment (see `parent_type`). An id can be a `pay_...`, `itm_...`, `cpa_...`, `pyt_...`, or `cor_...` id. When `parent_type` is `correction`, this is the correction's id.
+                    example: pay_ENA4k8LMHbgpV07GLGSv
+                  payment_attempts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: pya_GaeJoEAzbqqc2D9GMfOF
+                        created_at:
+                          type: string
+                          example: '2022-02-18T21:32:44.957364Z'
+                        expected_completion_date:
+                          type: string
+                          example: '2022-02-25'
+                        status:
+                          type: string
+                          example: failed
+                        failure_code: {}
+                        payment_method:
+                          type: string
+                          example: wire
+                        payment_instrument: {}
+                        wire_details:
+                          type: object
+                          properties:
+                            account_number:
+                              type: string
+                              example: '3302826020'
+                            routing_number:
+                              type: string
+                              example: '121140399'
+                            bank_name:
+                              type: string
+                              example: Silicon Valley Bank
+                            account_name:
+                              type: string
+                              example: SVB for benefit of CHECK TECHNOLOGIES
+                            account_address:
+                              type: string
+                              example: 3003 Tasman Drive, Santa Clara, CA 95054
+                            amount:
+                              type: number
+                              example: 4522.04
+                              default: 0
+                  can_retry:
+                    type: boolean
+                    example: false
+                    default: true
+                  can_refund:
+                    type: boolean
+                    example: false
+                    default: true
+                  direction:
+                    type: string
+                    example: debit
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Payments
+components:
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

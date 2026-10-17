@@ -1,0 +1,828 @@
+openapi: 3.2.0
+info:
+  title: check-api Workplaces API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Workplaces
+paths:
+  /workplaces:
+    post:
+      summary: Create a workplace
+      description: Creates a new workplace.
+      operationId: create-a-workplace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - company
+              - address
+              properties:
+                company:
+                  type: string
+                  description: The company ID to associate with the workplace
+                name:
+                  type: string
+                  description: The name for the workplace
+                address:
+                  type: object
+                  required:
+                  - line1
+                  - city
+                  - state
+                  - postal_code
+                  properties:
+                    line1:
+                      type: string
+                      description: Street address or PO Box
+                    line2:
+                      type: string
+                      description: Apartment, suite, unit, or building
+                    city:
+                      type: string
+                      description: City, district, suburb, town, or village
+                    state:
+                      type: string
+                      description: 2-digit state code
+                    postal_code:
+                      type: string
+                      description: 5-digit postal code or zip code
+                    country:
+                      type: string
+                      description: Read only.
+                      default: US
+                active:
+                  type: boolean
+                  description: Indicates whether the workplace can be associated with an employee for payroll
+                  default: true
+                metadata:
+                  type: string
+                  description: Additional loosely structured information to associate with the workplace
+                  format: json
+      responses:
+        '201':
+          description: '201'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"wrk_oRgjEaRycoCPuS5TqVkm\",\n  \"name\": \"New York Office\",\n  \"address\": {\n    \"line1\": \"200 Park Ave\",\n    \"line2\": null,\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postal_code\": \"10166\",\n    \"country\": \"US\"\n  },\n  \"company\": \"com_P7JPeBhb8hH23iiReDQ5\",\n  \"active\": true,\n  \"metadata\": {}\n}"
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: wrk_oRgjEaRycoCPuS5TqVkm
+                  name:
+                    type: string
+                    example: New York Office
+                  address:
+                    type: object
+                    properties:
+                      line1:
+                        type: string
+                        example: 200 Park Ave
+                      line2: {}
+                      city:
+                        type: string
+                        example: New York
+                      state:
+                        type: string
+                        example: NY
+                      postal_code:
+                        type: string
+                        example: '10166'
+                      country:
+                        type: string
+                        example: US
+                  company:
+                    type: string
+                    example: com_P7JPeBhb8hH23iiReDQ5
+                  active:
+                    type: boolean
+                    example: true
+                    default: true
+                  metadata:
+                    type: object
+                    properties: {}
+      deprecated: false
+      tags:
+      - Workplaces
+    get:
+      summary: List workplaces
+      description: Returns a list of workplaces.
+      operationId: list-workplaces
+      parameters:
+      - name: company
+        in: query
+        description: Return workplaces for this company ID.
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of workplaces returned per page. The maximum value is 500.
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: id
+        in: query
+        description: Filter the list to the specified IDs. For more details, check out the [Bulk Get Requests guide](https://docs.checkhq.com/docs/bulk-resource-get-requests).
+        schema:
+          type: array
+          items:
+            type: string
+      - $ref: '#/components/parameters/MetadataListFilter'
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value:
+                    next: https://sandbox.checkhq.com/workplaces?cursor=cD0lNUIlMjIyMDI1LTA5LTI0KzEyJTNBNTclM0E1Ny43NDE2MzglMkIwMCUzQTAwJTIyJTJDKyUyMjQyMzQxNjclMjIlNUQ%3D
+                    previous: null
+                    results:
+                    - id: wrk_Cjy24FaEY59iyC7MM6Yg
+                      name: Office
+                      address:
+                        line1: 36 E 30th St
+                        line2: null
+                        city: New York
+                        state: NY
+                        postal_code: '10016'
+                        country: US
+                      company: com_GlAxMQVO1ZJ0BNbO6pss
+                      active: true
+                      metadata: {}
+                    - id: wrk_tbjk2cBd4LdXNmH5WhMi
+                      name: Test
+                      address:
+                        line1: 1100 Congress Ave.
+                        line2: null
+                        city: Austin
+                        state: TX
+                        postal_code: '78701'
+                        country: US
+                      company: com_kzxTzDHxGXPE6h130d1Y
+                      active: true
+                      metadata: {}
+                    - id: wrk_w5g4x5TbLc76YSykVG6L
+                      name: Test
+                      address:
+                        line1: 1100 Congress Ave.
+                        line2: null
+                        city: Austin
+                        state: TX
+                        postal_code: '78701'
+                        country: US
+                      company: com_2g2yeh41BPJYG0Y6J443
+                      active: true
+                      metadata: {}
+                    - id: wrk_lrp4uOCscPS2nCUwZEbU
+                      name: Test
+                      address:
+                        line1: 1100 Congress Ave.
+                        line2: null
+                        city: Austin
+                        state: TX
+                        postal_code: '78701'
+                        country: US
+                      company: com_2g2yeh41BPJYG0Y6J443
+                      active: true
+                      metadata: {}
+                    - id: wrk_Gy1jPQqfHQHl87gO4rLQ
+                      name: Test
+                      address:
+                        line1: 1100 Congress Ave.
+                        line2: null
+                        city: Austin
+                        state: TX
+                        postal_code: '78701'
+                        country: US
+                      company: com_wFr26TjgL22gQjErbwPJ
+                      active: true
+                      metadata: {}
+                    - id: wrk_uff2FaidpIMipLjW52Dr
+                      name: Test
+                      address:
+                        line1: 215 N 7th St
+                        line2: null
+                        city: Phoenix
+                        state: AZ
+                        postal_code: '85034'
+                        country: US
+                      company: com_d5UfsFrOPrlA4JbTdCjV
+                      active: true
+                      metadata: {}
+                    - id: wrk_Er0APJKUiC1u2Kxbtqbv
+                      name: Test
+                      address:
+                        line1: 215 N 7th St
+                        line2: null
+                        city: Phoenix
+                        state: AZ
+                        postal_code: '85034'
+                        country: US
+                      company: com_c3R5JmwCVbAetzX1w4yZ
+                      active: true
+                      metadata: {}
+                    - id: wrk_iL1V51knrhDTL7i4iqOB
+                      name: Test
+                      address:
+                        line1: One Apple Park Way
+                        line2: null
+                        city: Cupertino
+                        state: CA
+                        postal_code: '95014'
+                        country: US
+                      company: com_c3R5JmwCVbAetzX1w4yZ
+                      active: true
+                      metadata: {}
+                    - id: wrk_vP3NUgfqDuD5tg9sNF4N
+                      name: Test
+                      address:
+                        line1: One Apple Park Way
+                        line2: null
+                        city: Cupertino
+                        state: CA
+                        postal_code: '95014'
+                        country: US
+                      company: com_p5nReas6gb8Aw48QfE6e
+                      active: true
+                      metadata: {}
+                    - id: wrk_CTnqdVGxS69jbs1dC5eP
+                      name: Test
+                      address:
+                        line1: One Apple Park Way
+                        line2: null
+                        city: Cupertino
+                        state: CA
+                        postal_code: '95014'
+                        country: US
+                      company: com_9qldmYtfl6cFvbIzZn0e
+                      active: true
+                      metadata: {}
+                    - id: wrk_eo88ZMKNvv5EqM70AOwB
+                      name: Test
+                      address:
+                        line1: 20 W Baltimore St
+                        line2: null
+                        city: Baltimore
+                        state: MD
+                        postal_code: '21201'
+                        country: US
+                      company: com_mVSCLlJngninKksgOyje
+                      active: true
+                      metadata: {}
+                    - id: wrk_i0yevwoZQlY2RJYfGAZp
+                      name: Test
+                      address:
+                        line1: 300 Cliff St
+                        line2: null
+                        city: Scranton
+                        state: PA
+                        postal_code: '18503'
+                        country: US
+                      company: com_mVSCLlJngninKksgOyje
+                      active: true
+                      metadata: {}
+                    - id: wrk_6wbEmEtgSwotblk3MzSO
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_bdLK50FwnGargU74swU2
+                      active: true
+                      metadata: {}
+                    - id: wrk_2u4dpqmFCiIphtEFypil
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_ekr45SjWT7vYGQXrpKz3
+                      active: true
+                      metadata: {}
+                    - id: wrk_WMKTsahQb88WpwFVdQ7p
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_sPUTmTct6fYsZlGEe4xt
+                      active: true
+                      metadata: {}
+                    - id: wrk_ZIoc1wVBPqzn4vcqbriz
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_sPUTmTct6fYsZlGEe4xt
+                      active: true
+                      metadata: {}
+                    - id: wrk_snyZbKhaEWcN2iC8z2Tu
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_sPUTmTct6fYsZlGEe4xt
+                      active: true
+                      metadata: {}
+                    - id: wrk_q0gKHXFWFrzos9Oq4ocl
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_DJFQquc7Fw5Zuafu0QNv
+                      active: true
+                      metadata: {}
+                    - id: wrk_WLOKh2iGr43Et9I05hBs
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_DJFQquc7Fw5Zuafu0QNv
+                      active: true
+                      metadata: {}
+                    - id: wrk_WdrvkyDOfqIvzeEZXcmS
+                      name: Test
+                      address:
+                        line1: 748 Memorial Dr
+                        line2: null
+                        city: Cambridge
+                        state: MA
+                        postal_code: 02139
+                        country: US
+                      company: com_gL60weIhURtQISOxrdsb
+                      active: true
+                      metadata: {}
+                    - id: wrk_jI3ERpKOepU8uSODvGla
+                      name: Test
+                      address:
+                        line1: 49 Rodick St
+                        line2: null
+                        city: Bar Harbor
+                        state: ME
+                        postal_code: 04609
+                        country: US
+                      company: com_gL60weIhURtQISOxrdsb
+                      active: true
+                      metadata: {}
+                    - id: wrk_ulec2a4hts7yXEDmN7ER
+                      name: Test
+                      address:
+                        line1: 237 7th St
+                        line2: null
+                        city: Pittsburgh
+                        state: PA
+                        postal_code: '15222'
+                        country: US
+                      company: com_plkzYWEeoMj7Qdnf35RD
+                      active: true
+                      metadata: {}
+                    - id: wrk_NI5APlPZVK6AvSuJiqA6
+                      name: Test
+                      address:
+                        line1: 300 Cliff St
+                        line2: null
+                        city: Scranton
+                        state: PA
+                        postal_code: '18503'
+                        country: US
+                      company: com_plkzYWEeoMj7Qdnf35RD
+                      active: true
+                      metadata: {}
+                    - id: wrk_z4EH5PU5l1dFrJBejAAk
+                      name: Test
+                      address:
+                        line1: 101 Taylor Run Rd
+                        line2: null
+                        city: Monongahela
+                        state: PA
+                        postal_code: '15063'
+                        country: US
+                      company: com_plkzYWEeoMj7Qdnf35RD
+                      active: true
+                      metadata: {}
+                    - id: wrk_LqZD4BcqssWNigddvNyZ
+                      name: Test
+                      address:
+                        line1: 101 Taylor Run Rd
+                        line2: null
+                        city: Monongahela
+                        state: PA
+                        postal_code: '15063'
+                        country: US
+                      company: com_gznucshcATbHycSoZ4IF
+                      active: true
+                      metadata: {}
+              schema:
+                type: object
+                properties:
+                  next:
+                    type: string
+                    example: https://sandbox.checkhq.com/workplaces?cursor=cD0lNUIlMjIyMDI1LTA5LTI0KzEyJTNBNTclM0E1Ny43NDE2MzglMkIwMCUzQTAwJTIyJTJDKyUyMjQyMzQxNjclMjIlNUQ%3D
+                  previous:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: wrk_Cjy24FaEY59iyC7MM6Yg
+                        name:
+                          type: string
+                          example: Office
+                        address:
+                          type: object
+                          properties:
+                            line1:
+                              type: string
+                              example: 36 E 30th St
+                            line2:
+                              type: string
+                            city:
+                              type: string
+                              example: New York
+                            state:
+                              type: string
+                              example: NY
+                            postal_code:
+                              type: string
+                              example: '10016'
+                            country:
+                              type: string
+                              example: US
+                        company:
+                          type: string
+                          example: com_GlAxMQVO1ZJ0BNbO6pss
+                        active:
+                          type: boolean
+                          example: true
+                          default: true
+                        metadata:
+                          type: object
+                          properties: {}
+      deprecated: false
+      tags:
+      - Workplaces
+  /workplaces/{workplace}:
+    patch:
+      summary: Update a workplace
+      description: Updates the specified workplace.
+      operationId: update-a-workplace
+      parameters:
+      - name: workplace
+        in: path
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company:
+                  type: string
+                  description: Company ID to associate with the workplace.
+                name:
+                  type: string
+                  description: Name for the workplace.
+                address:
+                  type: object
+                  required:
+                  - line1
+                  - city
+                  - state
+                  - postal_code
+                  properties:
+                    line1:
+                      type: string
+                      description: Street address or PO Box
+                    line2:
+                      type: string
+                      description: Apartment, suite, unit, or building
+                    city:
+                      type: string
+                      description: City, district, suburb, town, or village
+                    state:
+                      type: string
+                      description: 2-digit state code
+                    postal_code:
+                      type: string
+                      description: 5-digit postal code or zip code
+                    country:
+                      type: string
+                      description: Read only.
+                      default: US
+                active:
+                  type: boolean
+                  description: Indicates whether the workplace can be associated with an employee for payroll
+                metadata:
+                  type: string
+                  description: Additional loosely structured information to associate with the workplace
+                  format: json
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"id\": \"wrk_oRgjEaRycoCPuS5TqVkm\",\n  \"name\": \"New York Office\",\n  \"address\": {\n    \"line1\": \"200 Park Ave\",\n    \"line2\": null,\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postal_code\": \"10166\",\n    \"country\": \"US\"\n  },\n  \"company\": \"com_P7JPeBhb8hH23iiReDQ5\",\n  \"active\": true,\n  \"metadata\": {}\n}\n"
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: wrk_oRgjEaRycoCPuS5TqVkm
+                  name:
+                    type: string
+                    example: New York Office
+                  address:
+                    type: object
+                    properties:
+                      line1:
+                        type: string
+                        example: 200 Park Ave
+                      line2: {}
+                      city:
+                        type: string
+                        example: New York
+                      state:
+                        type: string
+                        example: NY
+                      postal_code:
+                        type: string
+                        example: '10166'
+                      country:
+                        type: string
+                        example: US
+                  company:
+                    type: string
+                    example: com_P7JPeBhb8hH23iiReDQ5
+                  active:
+                    type: boolean
+                    example: true
+                    default: true
+                  metadata:
+                    type: object
+                    properties: {}
+      deprecated: false
+      tags:
+      - Workplaces
+components:
+  parameters:
+    MetadataListFilter:
+      name: metadata
+      in: query
+      description: Return only results whose metadata contains every given key and value, for example `metadata[external_id]=123`. Pass keys using bracket notation. Multiple keys are combined with AND. Brackets must be URL-encoded in request URLs (`metadata%5Bkey%5D=value`).
+      schema:
+        type: object
+        additionalProperties:
+          type: string
+      style: deepObject
+      explode: true
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0

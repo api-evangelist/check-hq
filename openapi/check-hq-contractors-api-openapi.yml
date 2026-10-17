@@ -1,0 +1,778 @@
+openapi: 3.2.0
+info:
+  title: check-api Contractors API
+  version: '2025-01-01'
+servers:
+- url: https://sandbox.checkhq.com
+security:
+- sec0: []
+tags:
+- name: Contractors
+paths:
+  /contractors:
+    get:
+      summary: List contractors
+      description: Returns a list of all contractors.
+      operationId: list-contractors
+      parameters:
+      - name: company
+        in: query
+        description: Return contractors for the company specified by this company ID.
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of contractors returned per page. The maximum value is 25.
+        schema:
+          type: integer
+          format: int32
+      - name: id
+        in: query
+        description: Filter the list to the specified IDs. For more details, check out the [Bulk Get Requests guide](https://docs.checkhq.com/docs/bulk-resource-get-requests).
+        schema:
+          type: array
+          items:
+            type: string
+      - $ref: '#/components/parameters/MetadataListFilter'
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Contractors
+  /contractors/{contractor}/forms:
+    get:
+      summary: List contractor forms
+      description: 'Returns a list of contractor forms for the specified contractor.
+
+
+        **Note: **Contractor forms are normally configured when contractors go through Contractor Onboard. Use the Contractor Forms API only if you''re building a custom integration for contractor onboarding.'
+      operationId: list-contractor-forms
+      parameters:
+      - name: contractor
+        in: path
+        description: Return forms associated with this contractor ID
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"next\": null,\n    \"previous\": null,\n    \"results\": [\n        {\n            \"form\": {\n                \"id\": \"frm_FBt3oC1x28IrZELkhb21\",\n                \"description\": \"Federal W-4\",\n                “type”: “employee_withholding”,\n                \"link\": \"https://www.irs.gov/pub/irs-pdf/fw4.pdf\",\n                \"revision_date\": \"2020-01-01\"\n            },\n          \"submitted_at\": null,\n\t\t\t\t\t\"submitted_form_id\": null, \n            “document”: null,\n        }\n    ]\n}"
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Contractors
+  /contractors/{contractor}/forms/{form}/submit:
+    post:
+      summary: Submit a contractor form
+      description: 'Submits an contractor form.
+
+
+        **Note: **Contractor forms are normally configured when contractors go through Contractor Onboard. Use the Contractor Forms API only if you''re building a custom integration for contractor onboarding.'
+      operationId: submit-a-contractor-form
+      parameters:
+      - name: contractor
+        in: path
+        description: Submit a form to this contractor ID
+        schema:
+          type: string
+        required: true
+      - name: form
+        in: path
+        description: ID of the form to submit
+        schema:
+          type: string
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parameters:
+                  type: array
+                  description: An array of name-value pair objects, which represent the fields available on your form.
+                  items:
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    “submitted_at”: “2020-07-29 21:56:45.06366”,\n    “parameters”: [\n        {“name”: “exempt”, “value”: “no”},\n        {“name”: “filing_status”, “value”: “M”},\n    ]\n}"
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Contractors
+  /contractors/{contractor}/onboard:
+    post:
+      summary: Contractor Onboard
+      description: Generates an Onboard link for the specified contractor.
+      operationId: generate-contractor-onboard-link
+      parameters:
+      - name: contractor
+        in: path
+        description: Generate an onboard link for this contractor ID
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{"url":"{one_time_onboard_link}"}'
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: '{one_time_onboard_link}'
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Contractors
+  /contractors/{contractor}/payments:
+    get:
+      summary: List contractor payments
+      description: Returns a list of payments for the specified contractor from approved, managed payrolls. Payments on draft payrolls and on external payrolls are omitted. For external payroll contractor payments, use List external payrolls.
+      operationId: list-contractor-payments
+      parameters:
+      - name: contractor
+        in: path
+        description: ID of the contractor to return payments for
+        schema:
+          type: string
+        required: true
+      - name: payroll
+        in: query
+        description: Return payments for the payroll specified by this payroll ID.
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Number of payments returned per page. The maximum value is 25.
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: status
+        in: query
+        description: Filters to only show payments for payrolls with the specified status. If multiple `status` params are provided, payments with any of the statuses will be returned. Accepted values are `pending`, `processing`, `failed`, or `paid`.
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Return payments from payrolls with a payday on or after this date (YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: end
+        in: query
+        description: Return payments from payrolls with a payday on or before this date (YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "[\n    {\n      \"payroll\": \"pay_bdguw1kSIXjijjrzMTNP\",\n      \"payday\": \"2021-03-25\",\n      \"period_start\": \"2021-02-13\",\n      \"period_end\": \"2021-02-26\",\n      \"company\": {\n        \"trade_name\": \"Daily Bugle\",\n        \"legal_name\": \"Daily Bugle, Inc.\",\n        \"address\": {\n          \"line1\": \"4954 Berkeley Run Crossing\",\n          \"line2\": null,\n          \"city\": \"Norcross\",\n          \"state\": \"GA\",\n          \"postal_code\": \"30092\",\n          \"country\": \"US\"\n        },\n        \"phone\": \"5550897234\",\n      },\n      \"void_of\": null,\n      \"voided_by\": null,\n      \"contractor\": {\n        \"first_name\": \"Peter\",\n        \"middle_name\": null,\n        \"last_name\": \"Parker\",\n        \"type\": \"individual\",\n        \"business_name\": null,\n        \"email\": \"peterparker@gmail.com\",\n        \"ssn_last_four\": null,\n        \"ein\": null,\n        \"address\": {\n          \"line1\": \"630 Bedford Road\",\n          \"line2\": null,\n          \"city\": \"Tarrytown\",\n          \"state\": \"NY\",\n          \"postal_code\": \"10591\",\n          \"country\": \"US\"\n        }\n      },\n      \"amount\": \"100.00\",\n      \"amount_ytd\": \"100.00\",\n      \"reimbursement_amount\": \"50.00\",\n      \"reimbursement_amount_ytd\": \"50.00\"\n    }\n]"
+      deprecated: false
+      tags:
+      - Contractors
+  /contractors/{contractor}/payments/{payroll}:
+    get:
+      summary: Get a contractor pay statement
+      description: 'Returns the specified pay statement for the given contractor and payroll.
+
+
+        By default get the response as JSON. Use an `Accept: application/pdf` request header to download the paystub as a PDF document.'
+      operationId: get-a-contractor-pay-statement
+      parameters:
+      - name: contractor
+        in: path
+        description: Return paystub for this contractor ID
+        schema:
+          type: string
+        required: true
+      - name: payroll
+        in: path
+        description: Return the paystub for this payroll ID
+        schema:
+          type: string
+        required: true
+      - name: Accept
+        in: header
+        description: Either `application/pdf` or `application/json`
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n  \"payroll\": \"pay_ZJySEmsnnRVerLTcRNYx\",\n  \"payday\": \"2020-12-01\",\n  \"period_start\": \"2020-12-01\",\n  \"period_end\": \"2020-12-15\",\n  \"company\": {\n    \"trade_name\": \"Stark Industries\",\n    \"legal_name\": \"Stark Industries, Inc.\",\n    \"address\": {\n      \"line1\": \"100 Crosby Street\",\n      \"line2\": \"Suite 306\",\n      \"city\": \"New York\",\n      \"state\": \"NY\",\n      \"postal_code\": \"10012\",\n      \"country\": \"US\"\n    },\n    \"phone\": null\n  },\n  \"void_of\": null,\n  \"voided_by\": null,\n  \"contractor\": {\n    \"first_name\": \"Tony\",\n    \"middle_name\": null,\n    \"last_name\": \"Stark\",\n    \"type\": \"individual\",\n    \"business_name\": null,\n    \"email\": \"tonystark@gmail.com\",\n    \"ssn_last_four\": null,\n    \"ein\": null,\n    \"address\": {\n      \"line1\": \"801 N Brand Blvd #700\",\n      \"line2\": null,\n      \"city\": \"Glendale\",\n      \"state\": \"CA\",\n      \"postal_code\": \"91203\",\n      \"country\": \"US\"\n    }\n  },\n  \"net_pay\": \"1015.00\",\n  \"net_pay_ytd\": \"1015.00\",\n  \"amount\": \"1000.00\",\n  \"amount_ytd\": \"1000.00\",\n  \"reimbursement_amount\": \"15.00\",\n  \"reimbursement_amount_ytd\": \"15.00\"\n}"
+              schema:
+                type: object
+                properties:
+                  payroll:
+                    type: string
+                    example: pay_ZJySEmsnnRVerLTcRNYx
+                  payday:
+                    type: string
+                    example: '2020-12-01'
+                  period_start:
+                    type: string
+                    example: '2020-12-01'
+                  period_end:
+                    type: string
+                    example: '2020-12-15'
+                  company:
+                    type: object
+                    properties:
+                      trade_name:
+                        type: string
+                        example: Stark Industries
+                      legal_name:
+                        type: string
+                        example: Stark Industries, Inc.
+                      address:
+                        type: object
+                        properties:
+                          line1:
+                            type: string
+                            example: 100 Crosby Street
+                          line2:
+                            type: string
+                            example: Suite 306
+                          city:
+                            type: string
+                            example: New York
+                          state:
+                            type: string
+                            example: NY
+                          postal_code:
+                            type: string
+                            example: '10012'
+                          country:
+                            type: string
+                            example: US
+                      phone: {}
+                  void_of: {}
+                  voided_by: {}
+                  contractor:
+                    type: object
+                    properties:
+                      first_name:
+                        type: string
+                        example: Tony
+                      middle_name: {}
+                      last_name:
+                        type: string
+                        example: Stark
+                      type:
+                        type: string
+                        example: individual
+                      business_name: {}
+                      email:
+                        type: string
+                        example: tonystark@gmail.com
+                      ssn_last_four: {}
+                      ein: {}
+                      address:
+                        type: object
+                        properties:
+                          line1:
+                            type: string
+                            example: '801 N Brand Blvd #700'
+                          line2: {}
+                          city:
+                            type: string
+                            example: Glendale
+                          state:
+                            type: string
+                            example: CA
+                          postal_code:
+                            type: string
+                            example: '91203'
+                          country:
+                            type: string
+                            example: US
+                  net_pay:
+                    type: string
+                    example: '1015.00'
+                  net_pay_ytd:
+                    type: string
+                    example: '1015.00'
+                  amount:
+                    type: string
+                    example: '1000.00'
+                  amount_ytd:
+                    type: string
+                    example: '1000.00'
+                  reimbursement_amount:
+                    type: string
+                    example: '15.00'
+                  reimbursement_amount_ytd:
+                    type: string
+                    example: '15.00'
+                  net_pay_split:
+                    type: object
+                    nullable: true
+                    description: Net pay split details for direct deposit payments. Only returned when `payment_method` is `direct_deposit`.
+                    properties:
+                      id:
+                        type: string
+                        description: ID of the net pay split (`nps_…`).
+                      is_default:
+                        type: boolean
+                      deactivated_at:
+                        type: string
+                        nullable: true
+                        format: date-time
+                      deactivated_reason:
+                        type: string
+                        nullable: true
+                      splits:
+                        type: array
+                        description: Materialized split payments for this payroll item or contractor payment.
+                        items:
+                          type: object
+                          properties:
+                            payment_id:
+                              type: string
+                              description: ID of the payment for this split (`pyt_…`). Use with the paper check endpoint's `payment_id` query parameter to reissue a single failed direct deposit.
+                            allocated_amount:
+                              type: string
+                              description: Amount allocated to this split.
+                            bank_account:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                institution_name:
+                                  type: string
+                                  nullable: true
+                                type:
+                                  type: string
+                                  nullable: true
+                                subtype:
+                                  type: string
+                                  nullable: true
+                                mask:
+                                  type: string
+                                  nullable: true
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Contractors
+  /contractors/{contractor}/reveal:
+    get:
+      summary: Reveal contractor SSN
+      description: Reveal the unmasked SSN of a contractor. Reach out to Check to get support for this feature.
+      operationId: reveal-contractor-ssn
+      parameters:
+      - name: contractor
+        in: path
+        description: The ID of the contractor whose SSN you want to reveal
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: '200'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: "{\n    \"id\": \"ctr_Ks81mETRnHgsZ5tLV0cB\",\n    \"type\": \"individual\",\n    \"company\": \"com_dsE2Y4wCMg77HGlJB0Mk\",\n    \"workplaces\": [],\n    \"primary_workplace\": null,\n    \"first_name\": \"Bob\",\n    \"middle_name\": null,\n    \"last_name\": \"Jones\",\n    \"business_name\": null,\n    \"dob\": null,\n    \"start_date\": null,\n    \"termination_date\": null,\n    \"email\": null,\n    \"bank_accounts\": [],\n    \"ssn\": \"123456789\", // SSN field in this response only\n    \"ssn_last_four\": \"6789\",\n    \"ssn_validation_status\": \"invalid\",\n    \"payment_method_preference\": null,\n    \"onboard\": {\n        \"status\": \"blocking\",\n        \"blocking_steps\": [\n            \"address\"\n        ],\n        \"remaining_steps\": [\n            \"address\",\n            \"payment_method\"\n        ],\n        \"payment_method\": [\n            \"payment_method_preference_set\",\n            \"bank_account_exists\",\n            \"bank_account_verified\"\n        ],\n        \"address\": [\n            \"address_submitted\"\n        ]\n    },\n    \"ein\": null,\n    \"address\": {\n        \"line1\": null,\n        \"line2\": null,\n        \"city\": null,\n        \"state\": null,\n        \"postal_code\": null,\n        \"country\": \"US\"\n    },\n    \"metadata\": {},\n    \"1099_nec_electronic_consent_provided\": false\n}"
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: ctr_Ks81mETRnHgsZ5tLV0cB
+                  type:
+                    type: string
+                    example: individual
+                  company:
+                    type: string
+                    example: com_dsE2Y4wCMg77HGlJB0Mk
+                  workplaces:
+                    type: array
+                  primary_workplace: {}
+                  first_name:
+                    type: string
+                    example: Bob
+                  middle_name: {}
+                  last_name:
+                    type: string
+                    example: Jones
+                  business_name: {}
+                  dob: {}
+                  start_date: {}
+                  termination_date: {}
+                  email: {}
+                  bank_accounts:
+                    type: array
+                  ssn:
+                    type: string
+                    example: '123456789'
+                  ssn_last_four:
+                    type: string
+                    example: '6789'
+                  ssn_validation_status:
+                    type: string
+                    example: invalid
+                  payment_method_preference: {}
+                  onboard:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: blocking
+                      blocking_steps:
+                        type: array
+                        items:
+                          type: string
+                          example: address
+                      remaining_steps:
+                        type: array
+                        items:
+                          type: string
+                          example: address
+                      payment_method:
+                        type: array
+                        items:
+                          type: string
+                          example: payment_method_preference_set
+                      address:
+                        type: array
+                        items:
+                          type: string
+                          example: address_submitted
+                  ein: {}
+                  address:
+                    type: object
+                    properties:
+                      line1: {}
+                      line2: {}
+                      city: {}
+                      state: {}
+                      postal_code: {}
+                      country:
+                        type: string
+                        example: US
+                  metadata:
+                    type: object
+                    properties: {}
+                  1099_nec_electronic_consent_provided:
+                    type: boolean
+                    example: false
+                    default: true
+        '400':
+          description: '400'
+          content:
+            application/json:
+              examples:
+                Result:
+                  value: '{}'
+              schema:
+                type: object
+                properties: {}
+      deprecated: false
+      tags:
+      - Contractors
+components:
+  parameters:
+    MetadataListFilter:
+      name: metadata
+      in: query
+      description: Return only results whose metadata contains every given key and value, for example `metadata[external_id]=123`. Pass keys using bracket notation. Multiple keys are combined with AND. Brackets must be URL-encoded in request URLs (`metadata%5Bkey%5D=value`).
+      schema:
+        type: object
+        additionalProperties:
+          type: string
+      style: deepObject
+      explode: true
+  securitySchemes:
+    sec0:
+      type: apiKey
+      in: header
+      name: Authorization
+      x-bearer-format: bearer
+      x-default: YOUR_API_KEY
+x-readme-fauxas: true
+x-provenance:
+  method: searched
+  source: https://docs.checkhq.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.checkhq.com/reference/add-filing-blockers.md
+  - https://docs.checkhq.com/reference/approve-a-correction.md
+  - https://docs.checkhq.com/reference/approve-an-external-payroll.md
+  - https://docs.checkhq.com/reference/approve-payroll.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/bulk-get-employee-tax-params.md
+  - https://docs.checkhq.com/reference/bulk-update-employee-tax-parameters.md
+  - https://docs.checkhq.com/reference/cancel-a-payment.md
+  - https://docs.checkhq.com/reference/company-business-details.md
+  - https://docs.checkhq.com/reference/company-checklist-component.md
+  - https://docs.checkhq.com/reference/company-connect-bank-account.md
+  - https://docs.checkhq.com/reference/company-employee-setup.md
+  - https://docs.checkhq.com/reference/company-filing-authorization.md
+  - https://docs.checkhq.com/reference/company-pay-history.md
+  - https://docs.checkhq.com/reference/company-payment-setup.md
+  - https://docs.checkhq.com/reference/company-progress-tracker.md
+  - https://docs.checkhq.com/reference/company-signatory-agreements.md
+  - https://docs.checkhq.com/reference/company-tax-setup.md
+  - https://docs.checkhq.com/reference/company-team-setup.md
+  - https://docs.checkhq.com/reference/company-terms-of-service.md
+  - https://docs.checkhq.com/reference/company-verification-documents.md
+  - https://docs.checkhq.com/reference/contractor-roster.md
+  - https://docs.checkhq.com/reference/create-a-bank-account.md
+  - https://docs.checkhq.com/reference/create-a-company-provided-document.md
+  - https://docs.checkhq.com/reference/create-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/create-a-correction.md
+  - https://docs.checkhq.com/reference/create-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/create-a-payroll-item.md
+  - https://docs.checkhq.com/reference/create-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/create-a-report-run.md
+  - https://docs.checkhq.com/reference/create-a-workplace.md
+  - https://docs.checkhq.com/reference/create-an-earning-code.md
+  - https://docs.checkhq.com/reference/create-an-earning-rate.md
+  - https://docs.checkhq.com/reference/create-an-external-payroll.md
+  - https://docs.checkhq.com/reference/create-company-tax-elections.md
+  - https://docs.checkhq.com/reference/create-net-pay-split.md
+  - https://docs.checkhq.com/reference/create-payroll.md
+  - https://docs.checkhq.com/reference/create-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/credit-limits.md
+  - https://docs.checkhq.com/reference/delete-a-bank-account.md
+  - https://docs.checkhq.com/reference/delete-a-company-benefit.md
+  - https://docs.checkhq.com/reference/delete-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/delete-a-correction.md
+  - https://docs.checkhq.com/reference/delete-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-copy-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item-1.md
+  - https://docs.checkhq.com/reference/delete-a-payroll-item.md
+  - https://docs.checkhq.com/reference/delete-a-payroll.md
+  - https://docs.checkhq.com/reference/delete-a-post-tax-deduction.md
+  - https://docs.checkhq.com/reference/delete-a-webhook-config.md
+  - https://docs.checkhq.com/reference/delete-an-employee-benefit.md
+  - https://docs.checkhq.com/reference/download-a-report-run.md
+  - https://docs.checkhq.com/reference/download-a-setup-document.md
+  - https://docs.checkhq.com/reference/download-a-tax-package.md
+  - https://docs.checkhq.com/reference/employee-roster.md
+  - https://docs.checkhq.com/reference/employee-tax-setup.md
+  - https://docs.checkhq.com/reference/employee-tax-statements-1.md
+  - https://docs.checkhq.com/reference/employee-withholdings-setup.md
+  - https://docs.checkhq.com/reference/filing-preview-component.md
+  - https://docs.checkhq.com/reference/full-service-setup-submission.md
+  - https://docs.checkhq.com/reference/generate-contractor-onboard-link.md
+  - https://docs.checkhq.com/reference/generate-onboard-link.md
+  - https://docs.checkhq.com/reference/get-a-communication.md
+  - https://docs.checkhq.com/reference/get-a-company-filing.md
+  - https://docs.checkhq.com/reference/get-a-contractor-pay-statement.md
+  - https://docs.checkhq.com/reference/get-a-contractor-payment.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt-download.md
+  - https://docs.checkhq.com/reference/get-a-correction-receipt.md
+  - https://docs.checkhq.com/reference/get-a-correction.md
+  - https://docs.checkhq.com/reference/get-a-form.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment-receipt-2.md
+  - https://docs.checkhq.com/reference/get-a-fulfillment.md
+  - https://docs.checkhq.com/reference/get-a-log.md
+  - https://docs.checkhq.com/reference/get-a-notification.md
+  - https://docs.checkhq.com/reference/get-a-paper-check-2.md
+  - https://docs.checkhq.com/reference/get-a-paper-check.md
+  - https://docs.checkhq.com/reference/get-a-pay-schedule.md
+  - https://docs.checkhq.com/reference/get-a-report-run.md
+  - https://docs.checkhq.com/reference/get-a-setup-document.md
+  - https://docs.checkhq.com/reference/get-a-setup.md
+  - https://docs.checkhq.com/reference/get-a-tax-package.md
+  - https://docs.checkhq.com/reference/get-a-tax.md
+  - https://docs.checkhq.com/reference/get-a-webhook-delivery.md
+  - https://docs.checkhq.com/reference/get-an-agency.md
+  - https://docs.checkhq.com/reference/get-an-earning-code.md
+  - https://docs.checkhq.com/reference/get-an-earning-rate.md
+  - https://docs.checkhq.com/reference/get-an-employees-paystubs.md
+  - https://docs.checkhq.com/reference/get-an-external-payroll.md
+  - https://docs.checkhq.com/reference/get-an-integration-partner-copy.md
+  - https://docs.checkhq.com/reference/get-child-support-payments-report.md
+  - https://docs.checkhq.com/reference/get-company-paydays.md
+  - https://docs.checkhq.com/reference/get-paper-checks-report.md
+  - https://docs.checkhq.com/reference/get-paper-checks.md
+  - https://docs.checkhq.com/reference/get-paydays.md
+  - https://docs.checkhq.com/reference/get-payroll-journal.md
+  - https://docs.checkhq.com/reference/get-payroll.md
+  - https://docs.checkhq.com/reference/integration-partners-copy.md
+  - https://docs.checkhq.com/reference/integration-partners.md
+  - https://docs.checkhq.com/reference/list-a-webhook-config.md
+  - https://docs.checkhq.com/reference/list-active-funding-strikes.md
+  - https://docs.checkhq.com/reference/list-agencies.md
+  - https://docs.checkhq.com/reference/list-bank-accounts.md
+  - https://docs.checkhq.com/reference/list-benefits.md
+  - https://docs.checkhq.com/reference/list-communications.md
+  - https://docs.checkhq.com/reference/list-companies.md
+  - https://docs.checkhq.com/reference/list-company-authorization-documents.md
+  - https://docs.checkhq.com/reference/list-company-benefits.md
+  - https://docs.checkhq.com/reference/list-company-filings.md
+  - https://docs.checkhq.com/reference/list-company-tax-documents.md
+  - https://docs.checkhq.com/reference/list-company-tax-elections.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-company-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-contractor-forms.md
+  - https://docs.checkhq.com/reference/list-contractor-payments.md
+  - https://docs.checkhq.com/reference/list-contractor-tax-documents.md
+  - https://docs.checkhq.com/reference/list-contractors.md
+  - https://docs.checkhq.com/reference/list-corrections.md
+  - https://docs.checkhq.com/reference/list-earning-codes.md
+  - https://docs.checkhq.com/reference/list-earning-rates.md
+  - https://docs.checkhq.com/reference/list-employee-tax-documents.md
+  - https://docs.checkhq.com/reference/list-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/list-employee-tax-parameter-settings.md
+  - https://docs.checkhq.com/reference/list-employee-tax-statements.md
+  - https://docs.checkhq.com/reference/list-employees-tax-parameters.md
+  - https://docs.checkhq.com/reference/list-employees.md
+  - https://docs.checkhq.com/reference/list-external-payrolls.md
+  - https://docs.checkhq.com/reference/list-forms.md
+  - https://docs.checkhq.com/reference/list-fulfillments.md
+  - https://docs.checkhq.com/reference/list-integration-accesses-1.md
+  - https://docs.checkhq.com/reference/list-integration-permissions-copy.md
+  - https://docs.checkhq.com/reference/list-integration-permissions.md
+  - https://docs.checkhq.com/reference/list-logs.md
+  - https://docs.checkhq.com/reference/list-net-pay-splits.md
+  - https://docs.checkhq.com/reference/list-notifications.md
+  - https://docs.checkhq.com/reference/list-pay-schedules.md
+  - https://docs.checkhq.com/reference/list-payments.md
+  - https://docs.checkhq.com/reference/list-payroll-items.md
+  - https://docs.checkhq.com/reference/list-payrolls.md
+  - https://docs.checkhq.com/reference/list-post-tax-deductions.md
+  - https://docs.checkhq.com/reference/list-report-runs.md
+  - https://docs.checkhq.com/reference/list-setup-documents.md
+  - https://docs.checkhq.com/reference/list-setups.md
+  - https://docs.checkhq.com/reference/list-tax-deposits.md
+  - https://docs.checkhq.com/reference/list-taxes.md
+  - https://docs.checkhq.com/reference/list-usage-records.md
+  - https://docs.checkhq.com/reference/list-usage-summaries.md
+  - https://docs.checkhq.com/reference/list-webhook-deliveries.md
+  - https://docs.checkhq.com/reference/list-workplaces.md
+  - https://docs.checkhq.com/reference/preview-a-correction.md
+  - https://docs.checkhq.com/reference/preview-an-external-payroll.md
+  - https://docs.checkhq.com/reference/preview-payroll.md
+  - https://docs.checkhq.com/reference/previous-payroll-provider-access.md
+  - https://docs.checkhq.com/reference/refund-a-payment.md
+  - https://docs.checkhq.com/reference/remove-filing-blockers.md
+  - https://docs.checkhq.com/reference/reopen-a-correction.md
+  - https://docs.checkhq.com/reference/reopen-a-pending-payroll.md
+  - https://docs.checkhq.com/reference/reopen-payroll.md
+  - https://docs.checkhq.com/reference/request-a-tax-package.md
+  - https://docs.checkhq.com/reference/request-embedded-setup.md
+  - https://docs.checkhq.com/reference/retry-a-payment.md
+  - https://docs.checkhq.com/reference/retry-a-webhook-delivery-in-sandbox.md
+  - https://docs.checkhq.com/reference/reveal-account-number.md
+  - https://docs.checkhq.com/reference/reveal-contractor-ssn.md
+  - https://docs.checkhq.com/reference/reveal-employee-ssn.md
+  - https://docs.checkhq.com/reference/run-payroll.md
+  - https://docs.checkhq.com/reference/sandbox-complete-disbursements.md
+  - https://docs.checkhq.com/reference/sandbox-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-complete-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-correction-start-processing.md
+  - https://docs.checkhq.com/reference/sandbox-fail-funding.md
+  - https://docs.checkhq.com/reference/sandbox-start-processing.md
+  - https://docs.checkhq.com/reference/submit-a-contractor-form.md
+  - https://docs.checkhq.com/reference/update-a-bank-account.md
+  - https://docs.checkhq.com/reference/update-a-company.md
+  - https://docs.checkhq.com/reference/update-a-correction.md
+  - https://docs.checkhq.com/reference/update-a-webhook-config.md
+  - https://docs.checkhq.com/reference/update-a-workplace.md
+  - https://docs.checkhq.com/reference/update-an-earning-rate.md
+  - https://docs.checkhq.com/reference/update-an-external-payroll.md
+  - https://docs.checkhq.com/reference/update-company-tax-elections.md
+  - https://docs.checkhq.com/reference/update-employee-tax-elections.md
+  - https://docs.checkhq.com/reference/update-payroll.md
+  - https://docs.checkhq.com/reference/update-the-enrollment-profile.md
+  - https://docs.checkhq.com/reference/validate-address.md
+  - https://docs.checkhq.com/reference/validate-an-external-payroll.md
+  - https://docs.checkhq.com/reference/void-a-payroll.md
+  - https://docs.checkhq.com/reference/workplace-roster.md
+  merge:
+    pages: 188
+    deduped: 195
+    conflicts_kept_first: 0
