@@ -807,6 +807,8 @@ apis:
   humanURL: https://docs.checkhq.com
   baseURL: https://api.checkhq.com
   tags:
+  - Integration
+  tags_raw:
   - Integrations
   properties:
   - type: OpenAPI
@@ -849,6 +851,8 @@ apis:
   humanURL: https://docs.checkhq.com
   baseURL: https://api.checkhq.com
   tags:
+  - Notification
+  tags_raw:
   - Notifications
   properties:
   - type: OpenAPI
@@ -975,6 +979,8 @@ apis:
   humanURL: https://docs.checkhq.com
   baseURL: https://api.checkhq.com
   tags:
+  - Tax
+  tags_raw:
   - Taxes
   properties:
   - type: OpenAPI
